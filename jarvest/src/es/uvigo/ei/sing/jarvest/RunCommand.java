@@ -29,7 +29,6 @@ import java.util.Map;
 
 import es.uvigo.ei.sing.jarvest.core.OutputHandler;
 import es.uvigo.ei.sing.jarvest.core.Transformer;
-import es.uvigo.ei.sing.jarvest.core.XMLInputOutput;
 import es.uvigo.ei.sing.jarvest.dsl.Jarvest;
 import es.uvigo.ei.sing.yacli.AbstractCommand;
 import es.uvigo.ei.sing.yacli.Option;
@@ -54,14 +53,15 @@ public class RunCommand extends AbstractCommand{
 					final Jarvest lang = new Jarvest();
 					
 					trans = lang.eval(new File(fileName));
-					XMLInputOutput.writeTransformer(trans, System.out);
+					//XMLInputOutput.writeTransformer(trans, System.out);
 					
 				}else{
 					throw new IllegalArgumentException("Robot file not found: "+file);
 				}
 			}else{
 				
-				System.err.println("You must provide the robot as a file or as an inline code");
+				System.err.println("You must provide the robot as a file or as an inline code.");
+				
 				System.exit(1);
 			}
 		}
@@ -85,7 +85,7 @@ public class RunCommand extends AbstractCommand{
 		};
 		trans.setOutputHandler(new MyOutputHandler());
 		
-		if (parameters.get(findOption("n"))!=null){
+		if (!super.hasFlag(parameters, "n")){
 			BufferedReader input = new BufferedReader(new InputStreamReader(System.in));		
 			for (String line = input.readLine(); line!=null; line=input.readLine()){
 				trans.pushString(line);

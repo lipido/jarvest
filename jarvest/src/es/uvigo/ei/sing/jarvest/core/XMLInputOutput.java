@@ -101,7 +101,6 @@ public class XMLInputOutput {
 		XMLInputOutput inputOutput = new XMLInputOutput();
 		inputOutput.doc = doc;
 		Transformer toret =  inputOutput.parseRobot();
-		XMLInputOutput.writeTransformer(toret, System.err);
 		return toret;
 	}
 
