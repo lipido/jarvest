@@ -49,7 +49,7 @@
 	        <copy file="${lib}/commons-httpclient-3.1.jar" todir="${dist}/jarvest_lib"/>
 	        <copy file="${lib}/commons-logging-1.1.1.jar" todir="${dist}/jarvest_lib"/>
 	        <copy file="${lib}/htmlcleaner1_55.jar" todir="${dist}/jarvest_lib"/>
-	        <copy file="${lib}/jruby-complete-1.6.7.jar" todir="${dist}/jarvest_lib"/>
+	        <copy file="${lib}/jruby-complete-1.6.7.jar" todir="${dist}/jarvest_lib"/>			
 	        <copy file="${lib}/yacli.jar" todir="${dist}/jarvest_lib"/>
 	        
 	    </target>

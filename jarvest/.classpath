@@ -8,5 +8,7 @@
 	<classpathentry kind="lib" path="lib/htmlcleaner1_55.jar"/>
 	<classpathentry kind="lib" path="lib/jruby-complete-1.6.7.jar"/>
 	<classpathentry kind="lib" path="lib/yacli.jar"/>
+	<classpathentry kind="lib" path="lib/junit.jar"/>
+	<classpathentry kind="lib" path="lib/org.hamcrest.core_1.1.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
