@@ -24,6 +24,8 @@
 # generate them dinamically.
 
 # We include java packages for generating the XML.
+# Author: Oscar González Fernández
+
 require 'java'
 module XML
   include_package 'javax.xml.parsers'
@@ -203,6 +205,7 @@ end
 # It defines the `appender` call on *Language*. It can be used as
 # `appender('<br />')` or `appender(:append->'<br />')`
 class Appender < Transformer
+  custom_name "append"
   transformer_class :Appender
   param :append, :required => true, :default_value=>''
 end
@@ -210,7 +213,7 @@ end
 # transformer class is used to customize the name. It's used as `url`
 # or `url(:description=>'whatever')`
 class URLRetriever < Transformer
-  custom_name "url"
+  custom_name "wget"
   transformer_class :URLRetriever
 end
 
@@ -229,6 +232,7 @@ end
 # It defines the `replacer` call on *Language*. It's used as
 # `replacer(:sourceRE=> '', :dest=>'')`
 class Replacer < Transformer
+  custom_name "replace"
   transformer_class :Replacer
   param :sourceRE, :required => true
   param :dest, :required => true
@@ -236,6 +240,7 @@ end
 # It defines the `decorator` call on *Language*. It's used as
 # `decorator(:head=> '<p>', :tail=>'</p>')`.
 class Decorator < Transformer
+  custom_name "decorate"
   transformer_class :Decorator
   param :head, :default_value => ''
   param :tail, :default_value => ''
@@ -243,6 +248,7 @@ end
 # It defines the `merger` call on *Language*. It's used as
 # `merger`. It has no required parameters.
 class Merger < Transformer
+  custom_name "merge"
   transformer_class :Merger
 end
 

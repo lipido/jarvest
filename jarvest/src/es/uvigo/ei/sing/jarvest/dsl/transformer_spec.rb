@@ -1,3 +1,5 @@
+#Author: Óscar González Fernández
+
 require 'transformer'
 
 describe "jarvest minilanguage" do
