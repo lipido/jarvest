@@ -237,6 +237,19 @@ class Replacer < Transformer
   param :sourceRE, :required => true
   param :dest, :required => true
 end
+
+# It defines the `compare` call on *Language*. It's used as
+# `compare(:compareWith=> '7', :compareAs=>'Number')`
+class Comparator < Transformer
+  custom_name "compare"
+  transformer_class :Comparator
+  param :compareAs, :default_value=>'String'
+  param :compareWith, :required=>true
+  param :prefixIfGreater, :default_value=>'_GREATER_'
+  param :prefixIfLess, :default_value=>'_LESS_'
+  param :prefixIfEquals, :default_value=>'_EQUALS_'
+  param :prefixIfError, :default_value=>'_ERROR_'
+end  
 # It defines the `decorator` call on *Language*. It's used as
 # `decorator(:head=> '<p>', :tail=>'</p>')`.
 class Decorator < Transformer
