@@ -951,7 +951,6 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 						int start = matcher.start();
 						int end = matcher.end();
 						String number = lastValue.substring(start+2,end-2);
-						System.err.println("Number: "+number);
 						int position = Integer.parseInt(number);
 						if (source.length>position){
 							lastValue = lastValue.substring(0,start) + source[position] + lastValue.substring(end);
