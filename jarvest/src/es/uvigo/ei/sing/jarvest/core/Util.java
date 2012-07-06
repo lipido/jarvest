@@ -73,4 +73,24 @@ public class Util {
 		return toret;
 
 	}
+	public static String[] runRobot(Transformer robot, String[] input, OutputHandler handler) {
+		
+		final LinkedList<String> output = new LinkedList<String>();
+
+		
+		robot.setOutputHandler(handler);
+		
+		for (String string : input){
+			robot.pushString(string);
+			robot.closeOneInput();
+		}
+		
+		robot.closeAllInputs();
+		
+		String[] toret = new String[output.size()];
+		output.toArray(toret);
+		
+		return toret;
+
+	}
 }

@@ -45,6 +45,7 @@ import org.jruby.embed.LocalContextScope;
 import org.jruby.embed.ScriptingContainer;
 import org.w3c.dom.Document;
 
+import es.uvigo.ei.sing.jarvest.core.OutputHandler;
 import es.uvigo.ei.sing.jarvest.core.Transformer;
 import es.uvigo.ei.sing.jarvest.core.Util;
 import es.uvigo.ei.sing.jarvest.core.XMLInputOutput;
@@ -145,6 +146,24 @@ public class Jarvest {
         return Util.runRobot(eval(minilanguageProgram, name, line), input);
     }
 
+    public String[] exec(String minilanguageProgram, OutputHandler handler, String... input) {
+        return Util.runRobot(eval(minilanguageProgram), input, handler);
+    }
+
+    public String[] exec(File minilanguageProgram, OutputHandler handler, String... input) {
+        return Util.runRobot(eval(minilanguageProgram), input, handler);
+    }
+
+    public String[] exec(Reader minilanguageProgram, OutputHandler handler, String... input) {
+        return Util.runRobot(eval(minilanguageProgram), input, handler);
+    }
+
+    public String[] exec(Reader minilanguageProgram, String name,
+            int line, OutputHandler handler, String... input) {
+        return Util.runRobot(eval(minilanguageProgram, name, line), input, handler);
+    }
+
+    
     public String xmlToLanguage(File file) {
         try {
             return xmlToLanguage(new BufferedInputStream(new FileInputStream(
