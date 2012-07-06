@@ -22,6 +22,7 @@ package es.uvigo.ei.sing.jarvest.test;
 
 import org.junit.Test;
 
+import es.uvigo.ei.sing.jarvest.core.OutputHandler;
 import es.uvigo.ei.sing.jarvest.dsl.Jarvest;
 
 public class URL {
@@ -30,14 +31,47 @@ public class URL {
 	public void test() {
 		Jarvest jarvest = new Jarvest();
 		String[] results = jarvest.exec(
-				"url | xpath('//a/@href')", //robot! 
+				"wget | xpath('//a/@href')", //robot!			
 				"http://www.google.com" //inputs
-				);
+				
+		);
 		
-		
-		for (String s : results){
-			System.out.println(s);
+		for (String result: results){
+			System.out.println(result);
 		}
+		
+	}
+	@Test
+	public void testOutputHandler() {
+		Jarvest jarvest = new Jarvest();
+		
+		jarvest.exec(
+				"wget | xpath('//a/@href')", //robot! 
+				new OutputHandler(){
+
+					@Override
+					public void pushOutput(String string) {
+						System.out.print(string);
+						
+					}
+
+					@Override
+					public void outputFinished() {
+						System.out.println("[one output has finished]");
+						
+					}
+
+					@Override
+					public void allFinished() {
+						System.out.println("[the harvester has finished]");
+						
+					}
+					
+				},
+				"http://www.google.com" //inputs
+				
+		);
+		
 	}
 
 }
