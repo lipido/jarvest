@@ -541,6 +541,14 @@ class Language
     self
   end
 
+  def one_to_one &block
+    one_to_one = Language.new SimpleTransformer.new(:BRANCH_SCATTERED, :ORDERED)
+    inside = Language.new SimpleTransformer.new, &block
+    inside.transformer.add_child (Language.new Merger.new).transformer
+    one_to_one.transformer.add_child inside.transformer
+    @transformer.add_child one_to_one.transformer
+    self
+  end
 # It creates a new minilanguage scope with branch semantics. A branch
 # requires that its type and merge mode are specified as params. The
 # provided block is interpreted with the newly created instance. The
