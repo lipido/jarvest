@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #Author: Óscar González Fernández
 
 require 'transformer'
@@ -169,13 +170,13 @@ describe "jarvest minilanguage" do
 
   describe Language do
     it "should let put transformers in cascade" do
-      result = Language.interpret { wget > patternMatcher(:pattern => "bla") >
-        replacer(:sourceRE => "e", :dest => "a")}
+      result = Language.interpret { wget > match(:pattern => "bla") >
+        replace(:sourceRE => "e", :dest => "a")}
     end
 
     it "should let the language be supplied as a string" do
-      result = Language.language_eval %q{wget > patternMatcher(:pattern => "bla") >
-        replacer(:sourceRE => "e", :dest => "a")}
+      result = Language.language_eval %q{wget > match(:pattern => "bla") >
+        replace(:sourceRE => "e", :dest => "a")}
       result.should_not be_nil
       result.transformer_class.should == :SimpleTransformer
       result.branchtype.should be_equal(:CASCADE)
@@ -190,8 +191,8 @@ describe "jarvest minilanguage" do
     end
 
     it "should let put transformers as children of other transformer in cascade" do
-      result = Language.interpret { wget {patternMatcher(:pattern => "bla") >
-        replacer(:sourceRE => "e", :dest => "a")}}
+      result = Language.interpret { wget {match(:pattern => "bla") >
+        replace(:sourceRE => "e", :dest => "a")}}
       result.should_not be_nil
       result.transformer_class.should == :SimpleTransformer
       result.branchtype.should be_equal(:CASCADE)
@@ -204,8 +205,8 @@ describe "jarvest minilanguage" do
     end
 
     it "should let put several consecutive pipes" do
-      result = Language.interpret{ pipe {wget > patternMatcher(:pattern => "bla")} |
-        pipe {wget > patternMatcher(:pattern => "bla")}}
+      result = Language.interpret{ pipe {wget > match(:pattern => "bla")} |
+        pipe {wget > match(:pattern => "bla")}}
       result.should_not be_nil
       result.children.size.should == 2
       first_pipe = result.children[0]
@@ -218,8 +219,8 @@ describe "jarvest minilanguage" do
 
     it "should let put transformers in branch" do
       result = Language.interpret { wget > branch(:BRANCH_DUPLICATED,:SCATTERED) {
-          patternMatcher(:pattern => "bla")
-          patternMatcher(:pattern => "eoo") } > append(:append => "bla")}
+          match(:pattern => "bla")
+          match(:pattern => "eoo") } > append(:append => "bla")}
       result.should_not be_nil
       result.children.size.should == 3
       branch = result.children[1]
@@ -235,8 +236,8 @@ describe "jarvest minilanguage" do
 
     it "should let put transformers in branch as children of other transformer" do
       result = Language.interpret { wget(:BRANCH_DUPLICATED,:SCATTERED) {
-          patternMatcher(:pattern => "bla")
-          patternMatcher(:pattern => "eoo") } > append(:append => "bla")}
+          match(:pattern => "bla")
+          match(:pattern => "eoo") } > append(:append => "bla")}
       result.should_not be_nil
       result.children.size.should == 2
       wget = result.children[0]
@@ -254,15 +255,15 @@ describe "jarvest minilanguage" do
 
     it "should not let use | inside a branch" do
       lambda do Language.interpret { wget > branch(:BRANCH_DUPLICATED,:SCATTERED) {
-          patternMatcher(:pattern => "bla") | patternMatcher(:pattern => "eoo") }
+          match(:pattern => "bla") | match(:pattern => "eoo") }
       }
       end.should raise_error(RuntimeError, "| can't be used in a pipe branch")
     end
 
     it "should let use | after a branch" do
       result = Language.interpret { wget > branch(:BRANCH_DUPLICATED,:SCATTERED) {
-          patternMatcher(:pattern => "foo")
-          patternMatcher(:pattern => "bar")} | append(:append => :bar)
+          match(:pattern => "foo")
+          match(:pattern => "bar")} | append(:append => :bar)
       }
       result.children.size.should == 3
       result.children[2].transformer_class.should == :append
@@ -270,9 +271,9 @@ describe "jarvest minilanguage" do
 
     it "should let put transformers in cascade inside branch" do
       result = Language.interpret { wget > branch(:BRANCH_DUPLICATED,:SCATTERED) {
-          patternMatcher(:pattern => "bla")
-          patternMatcher(:pattern => "eoo")
-          pipe{wget > patternMatcher(:pattern => "bla")}
+          match(:pattern => "bla")
+          match(:pattern => "eoo")
+          pipe{wget > match(:pattern => "bla")}
         } > append(:append => "bla")}
       result.should_not be_nil
       result.children.size.should == 3
@@ -283,8 +284,8 @@ describe "jarvest minilanguage" do
 
     it "should let do a loop" do
       result = Language.interpret { wget |
-        pipe{ patternMatcher(:pattern => "bar") | wget}.repeat?{
-          patternMatcher(:pattern => "foo")
+        pipe{ match(:pattern => "bar") | wget}.repeat?{
+          match(:pattern => "foo")
         } | append(:append => "bar")
       }
       result.should_not be_nil
@@ -303,7 +304,7 @@ describe "jarvest minilanguage" do
       result = Language.interpret { wget(:BRANCH_DUPLICATED,:SCATTERED) {
           append(:append => "append")
         }.repeat? {
-          patternMatcher(:pattern => "inside-repeate")
+          match(:pattern => "inside-repeate")
         }}
       result.children.size.should == 1
       wget = result.children[0]
@@ -315,7 +316,7 @@ describe "jarvest minilanguage" do
     it "shouldn't allow to use repeat if no transformer defined at that level" do
       lambda {Language.interpret { wget |
           pipe{self.repeat? {
-              patternMatcher(:pattern => "foo")
+              match(:pattern => "foo")
             }} | append(:append => "bar")
         }
       }.should raise_error
@@ -323,8 +324,8 @@ describe "jarvest minilanguage" do
 
     it "should let put several transformer serially connected in the repeat clause" do
       result = Language.interpret { wget |
-        pipe{ patternMatcher(:pattern => "bla") | wget}.repeat?{
-          patternMatcher(:pattern => "prueba") > wget
+        pipe{ match(:pattern => "bla") | wget}.repeat?{
+          match(:pattern => "prueba") > wget
         } | append(:append => "bla")
       }
       result.should_not be_nil
@@ -336,9 +337,9 @@ describe "jarvest minilanguage" do
 
     it "should let put several transformers paralelly connected in the repeat clause" do
       result = Language.interpret { wget |
-        pipe{ patternMatcher(:pattern => "bla") | wget}.repeat?(:BRANCH_DUPLICATED,
+        pipe{ match(:pattern => "bla") | wget}.repeat?(:BRANCH_DUPLICATED,
                                                                :SCATTERED){
-          patternMatcher(:pattern => "prueba")
+          match(:pattern => "prueba")
           wget
         } | append(:append => "bla")
       }
