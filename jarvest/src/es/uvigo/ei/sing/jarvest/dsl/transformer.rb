@@ -541,6 +541,18 @@ class Language
     self
   end
 
+# It creates a new minilanguage scope with one_to_one semantics. 
+# Treats each input of the parent independently, and ensures only
+# <=1 outputs per input. This is done by creating a SimpleTransformer
+# with branchtype => BRANCH_SCATTERED, with only one child
+# (a SimpleTransformer) containing the internal block, and by adding a
+# merger at the end of the internal block. An example would be:
+# 
+#     url | xpath('//a/@href') | one_to_one {
+#		xpath('//tr/td/text()') | decorate(:tail=>'\n')
+#	  }
+#	  decorate(:head=>'[site_open]', :tail=>'[site_close'])
+#
   def one_to_one &block
     one_to_one = Language.new SimpleTransformer.new(:BRANCH_SCATTERED, :ORDERED)
     inside = Language.new SimpleTransformer.new, &block
@@ -549,6 +561,7 @@ class Language
     @transformer.add_child one_to_one.transformer
     self
   end
+  
 # It creates a new minilanguage scope with branch semantics. A branch
 # requires that its type and merge mode are specified as params. The
 # provided block is interpreted with the newly created instance. The
