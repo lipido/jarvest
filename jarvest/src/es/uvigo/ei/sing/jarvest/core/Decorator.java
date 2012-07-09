@@ -85,7 +85,10 @@ public class Decorator extends AbstractTransformer{
 	boolean closedInput = false;
 	@Override
 	protected void _closeOneInput() {
-		if (closedInput) throw new RuntimeException("closing too much!");
+		if (closedInput){
+			//TODO: This exception appears sometimes.... may be caused by preceding transformers with empty outputs closing them without opening
+			throw new RuntimeException("closing too much!");
+		}
 		closedInput =true;
 		firstCall=true;
 		super.getOutputHandler().pushOutput(super.restoreScapes(this.getTail()));
