@@ -33,8 +33,20 @@
 		  </copy>
 	</target>
 
-	
-	<target name="create_run_jar" depends="compile,tstamp">
+        <property name="spec-file-dir" location="${src}/es/uvigo/ei/sing/jarvest/dsl/" />
+
+        <target name="test">
+          <java jar="lib/jruby-complete-1.6.7.jar" failonerror="true" fork="true">
+            <arg value="-S" />
+            <arg value="gems/bin/rspec" />
+            <arg value="--default_path" />
+            <arg value="${spec-file-dir}" />
+            <arg value="-I" />
+            <arg value="${spec-file-dir}" />
+          </java>
+        </target>
+
+	<target name="create_run_jar" depends="compile,test,tstamp">
 		<mkdir dir="${dist}"/>
 	        <jar destfile="${dist}/jarvest.jar">
 	            <manifest>
