@@ -37,9 +37,9 @@ describe "jarvest minilanguage" do
       t.branchmergemode.should == :ORDERED
     end
 
-    it "should have branchmergemode SCATTERED as default" do
+    it "should have branchmergemode ORDERED as default" do
       t = SimpleTransformer.new({})
-      t.branchmergemode.should == :SCATTERED
+      t.branchmergemode.should == :ORDERED
     end
 
     it "should accept parameter loop" do
@@ -180,7 +180,7 @@ describe "jarvest minilanguage" do
       result.should_not be_nil
       result.transformer_class.should == :SimpleTransformer
       result.branchtype.should be_equal(:CASCADE)
-      result.branchmergemode.should be_equal(:SCATTERED)
+      result.branchmergemode.should be_equal(:ORDERED)
       result.children.size.should == 3
       first_wget = result.children[0]
       pattern_matcher = result.children[1]
@@ -196,7 +196,7 @@ describe "jarvest minilanguage" do
       result.should_not be_nil
       result.transformer_class.should == :SimpleTransformer
       result.branchtype.should be_equal(:CASCADE)
-      result.branchmergemode.should be_equal(:SCATTERED)
+      result.branchmergemode.should be_equal(:ORDERED)
       result.children.size.should == 1
       wget = result.children[0]
       wget.children.size.should == 2
