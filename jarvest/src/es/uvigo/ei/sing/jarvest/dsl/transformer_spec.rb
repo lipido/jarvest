@@ -185,7 +185,7 @@ describe "jarvest minilanguage" do
       first_wget = result.children[0]
       pattern_matcher = result.children[1]
       replacer = result.children[2]
-      first_wget.class.should == wgetRetriever
+      first_wget.class.should == URLRetriever
       pattern_matcher.class.should == PatternMatcher
       replacer.class.should == Replacer
     end
@@ -241,7 +241,7 @@ describe "jarvest minilanguage" do
       result.should_not be_nil
       result.children.size.should == 2
       wget = result.children[0]
-      wget.transformer_class.should == :wgetRetriever
+      wget.transformer_class.should == :URLRetriever
       wget.branchtype.should == :BRANCH_DUPLICATED
       wget.branchmergemode.should == :SCATTERED
       wget.children.size.should == 2
@@ -250,7 +250,7 @@ describe "jarvest minilanguage" do
       wget.children[1].should respond_to(:pattern)
       wget.children[1].pattern.should == "eoo"
       append = result.children[1]
-      append.transformer_class.should == :append
+      append.transformer_class.should == :Appender
     end
 
     it "should not let use | inside a branch" do
@@ -266,7 +266,7 @@ describe "jarvest minilanguage" do
           match(:pattern => "bar")} | append(:append => :bar)
       }
       result.children.size.should == 3
-      result.children[2].transformer_class.should == :append
+      result.children[2].transformer_class.should == :Appender
     end
 
     it "should let put transformers in cascade inside branch" do
@@ -297,7 +297,7 @@ describe "jarvest minilanguage" do
       pipe.children[0].pattern.should == "foo"
 
       result.children[2].children.size.should == 0
-      result.children[2].transformer_class.should == :append
+      result.children[2].transformer_class.should == :Appender
     end
 
     it "should let use repeat? with any kind, not only containers" do
