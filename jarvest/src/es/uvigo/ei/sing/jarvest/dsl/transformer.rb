@@ -548,7 +548,7 @@ class Language
 # (a SimpleTransformer) containing the internal block, and by adding a
 # merger at the end of the internal block. An example would be:
 # 
-#     url | xpath('//a/@href') | one_to_one {
+#     wget | xpath('//a/@href') | one_to_one {
 #		xpath('//tr/td/text()') | decorate(:tail=>'\n')
 #	  }
 #	  decorate(:head=>'[site_open]', :tail=>'[site_close'])
