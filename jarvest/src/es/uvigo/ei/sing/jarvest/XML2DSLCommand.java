@@ -28,15 +28,16 @@ import java.util.Map;
 import es.uvigo.ei.sing.jarvest.dsl.Jarvest;
 import es.uvigo.ei.sing.yacli.AbstractCommand;
 import es.uvigo.ei.sing.yacli.Option;
+import es.uvigo.ei.sing.yacli.Parameters;
 
 public class XML2DSLCommand extends AbstractCommand{
 
 	@Override
-	public void execute(Map<Option, Object> parameters) throws Exception {
+	public void execute(Parameters parameters) throws Exception {
 		final Jarvest lang = new Jarvest();
 		
 		
-		String fileName = this.getSingleValue(parameters, "f");
+		String fileName = parameters.getSingleValue(findOption("f"));
 		if (fileName!=null){
 			File file = new File(fileName);
 			if (file.exists()){

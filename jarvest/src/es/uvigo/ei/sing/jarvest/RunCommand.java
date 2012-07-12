@@ -25,27 +25,27 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import es.uvigo.ei.sing.jarvest.core.OutputHandler;
 import es.uvigo.ei.sing.jarvest.core.Transformer;
 import es.uvigo.ei.sing.jarvest.dsl.Jarvest;
 import es.uvigo.ei.sing.yacli.AbstractCommand;
 import es.uvigo.ei.sing.yacli.Option;
+import es.uvigo.ei.sing.yacli.Parameters;
 
 public class RunCommand extends AbstractCommand{
 
 	@Override
-	public void execute(Map<Option, Object> parameters) throws Exception {
+	public void execute(Parameters parameters) throws Exception {
 		
 		Transformer trans = null;
-		String code = this.getSingleValue(parameters, "p");
+		String code = parameters.getSingleValue(findOption("p"));
 		if (code!=null){			
 			final Jarvest lang = new Jarvest();
 			
 			trans = lang.eval(code);
 		}else{
-			String fileName = this.getSingleValue(parameters, "f");
+			String fileName = parameters.getSingleValue(findOption("f"));
 			if (fileName!=null){
 				
 				File file = new File(fileName);
@@ -85,7 +85,7 @@ public class RunCommand extends AbstractCommand{
 		};
 		trans.setOutputHandler(new MyOutputHandler());
 		
-		if (!super.hasFlag(parameters, "n")){
+		if (!parameters.hasFlag(findOption("n"))){
 			BufferedReader input = new BufferedReader(new InputStreamReader(System.in));		
 			for (String line = input.readLine(); line!=null; line=input.readLine()){
 				trans.pushString(line);
