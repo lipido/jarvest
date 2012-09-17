@@ -399,10 +399,10 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 				}else{
 					if (branchMergeMode == COLLAPSED){ 
 						outputHandler.outputFinished(); 
-						outputHandler.allFinished(); 
+						//outputHandler.allFinished(); 
 					}
-					else
-						outputHandler.allFinished();
+			/*		else
+						outputHandler.allFinished();*/
 					
 				}
 			}
@@ -437,7 +437,8 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 				}
 				if ((isLoop() && loopFinished==true && finishedChilds.size() == childs.size()-1) || (!isLoop() && finishedChilds.size() == childs.size())){
 					currentOutput = 0; //added 14/5/08
-					outputHandler.allFinished();
+					
+		//			outputHandler.allFinished();
 				}
 				
 			}
@@ -447,7 +448,7 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 				
 				if ((isLoop() && loopFinished==true && finishedChilds.size() == childs.size()-1) || (!isLoop() && finishedChilds.size() == childs.size())){
 					currentOutput = 0;//added 14/5/08
-					outputHandler.allFinished();
+				//	outputHandler.allFinished();
 				}
 				
 			}else if (branchMergeMode == MergeMode.COLLAPSED){
@@ -478,7 +479,7 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 				if ((isLoop() && loopFinished==true && finishedChilds.size() == childs.size()-1) || (!isLoop() && finishedChilds.size() == childs.size())){
 					currentOutput = 0;//added 14/5/08
 					outputHandler.outputFinished();
-					outputHandler.allFinished();
+				//	outputHandler.allFinished();
 				}
 			}
 			
@@ -674,7 +675,7 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 				firstChild = 1;
 			}
 			
-			if (childs.size()>0){
+			if ((!isLoop() && childs.size()>0) || (isLoop() && childs.size()>1)){
 				if (branchType == CASCADE){
 					childs.get(firstChild).pushString(string);
 				}
@@ -707,7 +708,7 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 			if (isLoop()){
 				firstChild = 1;
 			}
-			if (childs.size()>0 ){ 
+			if ((!isLoop() && childs.size()>0) || (isLoop() && childs.size()>1)){
 				if (branchType == CASCADE){
 					childs.get(firstChild).closeOneInput();					
 				}
@@ -735,7 +736,7 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 			if (isLoop()){
 				firstChild = 1;
 			}
-			if (childs.size()>0 ){
+			if ((!isLoop() && childs.size()>0) || (isLoop() && childs.size()>1)){
 				if (branchType == CASCADE){
 						childs.get(firstChild).closeAllInputs();
 					}
@@ -752,6 +753,7 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 					}
 					//childs.get((currentInput % childs.size())+firstChild).closeAllInputs();
 				}
+				if (!isLoop() || loopFinished) outputHandler.allFinished(); //dani
 			}
 			else{
 				if (branchMergeMode == COLLAPSED){
