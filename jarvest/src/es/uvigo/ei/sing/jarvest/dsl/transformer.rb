@@ -195,6 +195,7 @@ end
 class Xpath < Transformer
   transformer_class :HTMLMatcher
   param :XPath, :required => true
+  param :addTBody, :default_value => true
 end
 # This is not intended to be used as a direct call on *Language*. It
 # acts as a container of other transformers. For that you should use
