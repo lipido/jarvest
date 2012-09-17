@@ -10,5 +10,11 @@
 	<classpathentry kind="lib" path="lib/yacli.jar"/>
 	<classpathentry kind="lib" path="lib/junit.jar"/>
 	<classpathentry kind="lib" path="lib/org.hamcrest.core_1.1.0.jar"/>
+	<classpathentry kind="lib" path="lib-test/jetty-server-8.1.7.v20120910.jar"/>
+	<classpathentry kind="lib" path="lib-test/servlet-api-3.0.jar"/>
+	<classpathentry kind="lib" path="lib-test/jetty-util-8.1.7.v20120910.jar"/>
+	<classpathentry kind="lib" path="lib-test/jetty-io-8.1.7.v20120910.jar"/>
+	<classpathentry kind="lib" path="lib-test/jetty-continuation-8.1.7.v20120910.jar"/>
+	<classpathentry kind="lib" path="lib-test/jetty-http-8.1.7.v20120910.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
