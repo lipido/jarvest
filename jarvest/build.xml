@@ -44,6 +44,7 @@
             <arg value="-I" />
             <arg value="${spec-file-dir}" />
           </java>
+          <!-- TODO: add junit tests here -->
         </target>
 
 	<target name="create_run_jar" depends="compile,test,tstamp">
