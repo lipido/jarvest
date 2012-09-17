@@ -20,6 +20,8 @@ along with jARVEST Project.  If not, see <http://www.gnu.org/licenses/>.
 */
 package es.uvigo.ei.sing.jarvest.core;
 
+import java.util.regex.Pattern;
+
 public class Replacer extends AbstractTransformer{
 
 	/**
@@ -27,11 +29,30 @@ public class Replacer extends AbstractTransformer{
 	 */
 	private static final long serialVersionUID = 1L;
 	private String sourceRE="", dest="";
+	private boolean dotAll = true;
+	private Pattern pattern = Pattern.compile("", Pattern.DOTALL);
 	public Replacer(String sourceRE, String dest){
 		this.sourceRE = sourceRE;
 		this.dest = dest;
 	}
 	public Replacer(){
+		
+	}
+	
+	public void setDotAll(boolean dotAll) {
+		this.dotAll = dotAll;
+		if (this.sourceRE!=null){
+		
+			if (this.isDotAll()){
+				this.pattern = Pattern.compile(sourceRE, Pattern.DOTALL);
+			}else{
+				this.pattern = Pattern.compile(sourceRE);
+			}
+		}
+		
+	}
+	public boolean isDotAll() {
+		return dotAll;
 		
 	}
 	@Override
@@ -40,7 +61,7 @@ public class Replacer extends AbstractTransformer{
 		
 		int counter = 0;
 		for (String string : source){
-			toret[counter++] = string.replaceAll(sourceRE, super.restoreScapes(dest));
+			toret[counter++] = pattern.matcher(string).replaceAll(dest);
 		}
 		
 		return toret;
@@ -62,7 +83,12 @@ public class Replacer extends AbstractTransformer{
 	 * @param sourceRE the sourceRE to set
 	 */
 	public void setSourceRE(String sourceRE) {
-		this.sourceRE = sourceRE;
+		this.sourceRE = sourceRE;		
+		if (this.isDotAll()){
+			this.pattern = Pattern.compile(sourceRE, Pattern.DOTALL);
+		}else{
+			this.pattern = Pattern.compile(sourceRE);
+		}
 	}
 	/**
 	 * @return the dest
@@ -81,7 +107,7 @@ public class Replacer extends AbstractTransformer{
 	// NEW MODEL
 	@Override
 	protected void _closeOneInput() {		
-			this.getOutputHandler().pushOutput(super.getAndClearCurrentString().replaceAll(sourceRE, super.restoreScapes(dest)));
+			this.getOutputHandler().pushOutput(pattern.matcher(super.getAndClearCurrentString()).replaceAll(super.restoreScapes(dest)));
 			this.getOutputHandler().outputFinished();	
 	}
 	
