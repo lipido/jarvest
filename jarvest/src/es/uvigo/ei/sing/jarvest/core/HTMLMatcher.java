@@ -42,6 +42,7 @@ public class HTMLMatcher extends AbstractTransformer {
 
 	
 	private String xpath=""; 
+	private boolean addTBody=true;
 	
 	public HTMLMatcher(){
 		
@@ -59,7 +60,13 @@ public class HTMLMatcher extends AbstractTransformer {
 		
 	}
 	
+	public void setAddTBody(boolean addTBody) {
+		this.addTBody = addTBody;
+	}
 	
+	public boolean isAddTBody() {
+		return addTBody;
+	}
 	
 	
 	@Override	
@@ -117,7 +124,9 @@ public class HTMLMatcher extends AbstractTransformer {
 				super();
 				
 				//not insert tbody before all tr (removing the +tbody rule)
-				super.addTag("tr", TagInfo.CONTENT_ALL, TagInfo.BODY, "!table,^thead,^tfoot,#td,#th,tr,td,th,caption,colgroup");
+				if (!isAddTBody()){
+					super.addTag("tr", TagInfo.CONTENT_ALL, TagInfo.BODY, "!table,^thead,^tfoot,#td,#th,tr,td,th,caption,colgroup");
+				}
 				
 			}
 		};
