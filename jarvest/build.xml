@@ -6,15 +6,20 @@
 	<property name="cmd"  location="./cmd"/>
 	<property name="cmd-dist"  location="./cmd-dist"/>
 	<property name="lib" location="./lib"/>
+	<property name="lib-test" location="./lib-test"/>
+
 	<property name="version"  value="1.0"/>
 	
 	<path id="classpath">
 			<fileset dir="${lib}">
 				<include name="*.jar"/>
 			</fileset>
-			
+			<fileset dir="${lib-test}">
+				<include name="*.jar"/>
+			</fileset>
 			
 	</path>
+	
 	<target name="clean">
 			<delete dir="${bin}"/>
 			<delete dir="${dist}"/>
