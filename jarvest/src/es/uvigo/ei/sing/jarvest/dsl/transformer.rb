@@ -197,6 +197,15 @@ class Xpath < Transformer
   param :XPath, :required => true
   param :addTBody, :default_value => true
 end
+
+# It defines the `xpath` call on *Language*. It can be used as
+# `xpathxml('//a/@href')` or `xpathxml(:Xpath->'//a/@href')`
+class Xpathscrap < Transformer
+  transformer_class :HTMLMatcherScrap
+  param :XPath, :required => true
+  param :addTBody, :default_value => true
+end
+
 # This is not intended to be used as a direct call on *Language*. It
 # acts as a container of other transformers. For that you should use
 # the special calls `pipe` and `branch` that accept blocks.
