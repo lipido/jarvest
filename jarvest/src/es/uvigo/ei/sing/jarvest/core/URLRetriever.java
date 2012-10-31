@@ -26,7 +26,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
 
-public class URLRetriever extends AbstractTransformer{
+public class URLRetriever extends URLBasedTransformer{
 
 	/**
 	 * Serial Version UID
@@ -47,7 +47,7 @@ public class URLRetriever extends AbstractTransformer{
 				String contentString="";
 			
 				
-				contentString = HTTPUtils.getURLBodyAsString(string);
+				contentString = HTTPUtils.getURLBodyAsString(string, this.getAdditionalHeaders());
 				
 				toret[counter++] = contentString;
 			} catch (Exception e){
@@ -81,7 +81,7 @@ public class URLRetriever extends AbstractTransformer{
 			StringBuffer charsetb = new StringBuffer();
 			
 			//System.out.println("getting url body "+current);
-			is = HTTPUtils.getURLBody(current, charsetb );
+			is = HTTPUtils.getURLBody(current, charsetb, this.getAdditionalHeaders());
 			String charset = validCharset(charsetb.toString());
 			//System.out.println(charset);
 			input = new InputStreamReader(is, Charset.forName(charset));

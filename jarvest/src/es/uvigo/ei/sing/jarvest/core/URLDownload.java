@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-public class URLDownload extends AbstractTransformer{
+public class URLDownload extends URLBasedTransformer{
 
 	private static int fileCounter=0;
 	/**
@@ -118,6 +118,7 @@ public class URLDownload extends AbstractTransformer{
 	protected void _closeOneInput() {
 		InputStream input = null;
 		try {
+			
 			URL url = new URL(super.getAndClearCurrentString());
 			
 			//Infer a suitable file name
@@ -141,7 +142,12 @@ public class URLDownload extends AbstractTransformer{
 				destinyFile = new File(destinyFile.getAbsolutePath()+"_"+System.currentTimeMillis());
 			}
 			FileOutputStream output = new FileOutputStream(destinyFile);
-			input =  url.openConnection().getInputStream();
+			
+			StringBuffer charsetb = new StringBuffer();
+			
+			//System.out.println("getting url body "+current);
+			input = HTTPUtils.getURLBody(url.toString(), charsetb, this.getAdditionalHeaders());			
+			
 			byte[] bytes = new byte[1024];
 			int readed = 0;
 			while ((readed=input.read(bytes))!=-1){
