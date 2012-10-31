@@ -43,6 +43,7 @@ public class HTMLMatcher extends AbstractTransformer {
 	
 	private String xpath=""; 
 	private boolean addTBody=true;
+	private String ifNoMatch="--none--";
 	
 	public HTMLMatcher(){
 		
@@ -68,6 +69,12 @@ public class HTMLMatcher extends AbstractTransformer {
 		return addTBody;
 	}
 	
+	public void setIfNoMatch(String ifNoMatch) {
+		this.ifNoMatch = ifNoMatch;
+	}
+	public String getIfNoMatch() {
+		return ifNoMatch;
+	}
 	
 	@Override	
 	protected String[] _apply(String[] source) {
@@ -142,6 +149,10 @@ public class HTMLMatcher extends AbstractTransformer {
 			Object result = expr.evaluate(document, XPathConstants.NODESET);
 			NodeList nodes = (NodeList) result;
 			
+			if (nodes.getLength()==0 && !this.getIfNoMatch().equals("--none--")){
+				super.getOutputHandler().pushOutput(this.getIfNoMatch());
+				super.getOutputHandler().outputFinished();
+			}
 			for (int i = 0; i < nodes.getLength(); i++) {
 				
 				String output = nodes.item(i).getTextContent();
