@@ -37,6 +37,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
@@ -50,6 +51,7 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpClientError;
 import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
@@ -95,9 +97,17 @@ public class HTTPUtils {
 	private static int reading = 0;
 	private static String gettingContent = "";
 	public static InputStream getURLBody(final String url, StringBuffer charset) throws IOException{
+		return getURLBody(url, charset, new HashMap<String, String>());
+	}
+	
+	public static InputStream getURLBody(final String url, StringBuffer charset, Map<String, String> additionalHeaders) throws IOException{
 		HttpClient client = getClient();
 		System.err.println("Connecting to: "+url);
         final GetMethod get = new GetMethod(url);
+        
+        addHeaders(additionalHeaders, get);
+        
+        
        
 	       /* synchronized(HTTPUtils.class){
 	        	System.out.println("Trying to get "+url);
@@ -151,6 +161,14 @@ public class HTTPUtils {
         	throw new RuntimeException(e);
         }
 	}
+
+	private static void addHeaders(Map<String, String> additionalHeaders,
+			final HttpMethod method) {
+		for (String header : additionalHeaders.keySet()){
+			System.err.println("Adding header. "+header+": "+additionalHeaders.get(header) );
+        	method.addRequestHeader(header, additionalHeaders.get(header));
+        }
+	}
 	private static String validCharset(String string) {
 		
 		String input = string.toUpperCase();
@@ -158,11 +176,14 @@ public class HTTPUtils {
 		}else return Charset.defaultCharset().name();
 	}
 	public static String getURLBodyAsString(String url) throws IOException{
+		return getURLBodyAsString(url, new HashMap<String, String>());
+	}
+	public static String getURLBodyAsString(String url, Map<String, String> additionalHeaders) throws IOException{
 	
 		InputStream in =null;
 		try{
 			StringBuffer charsetb = new StringBuffer();
-			in= getURLBody(url,charsetb);
+			in= getURLBody(url,charsetb, additionalHeaders);
 			
 			String charset = validCharset(charsetb.toString());
 			Reader reader = new InputStreamReader(in, Charset.forName(charset));
@@ -195,8 +216,10 @@ public class HTTPUtils {
 			
 		}
 	}
-	
 	public synchronized static String doPost(String urlstring, String queryString, String separator) throws HttpException, IOException{
+		return doPost(urlstring, queryString, separator, new HashMap<String, String>());
+	}
+	public synchronized static String doPost(String urlstring, String queryString, String separator, Map<String, String> additionalHeaders) throws HttpException, IOException{
 		
 		
 		HashMap<String, String> query = parseQueryString(queryString, separator);
@@ -217,9 +240,10 @@ public class HTTPUtils {
         client.getHostConfiguration().setHost(url.getHost(), port, url.getProtocol());
         client.getParams().setCookiePolicy(CookiePolicy.BROWSER_COMPATIBILITY);
         
-        PostMethod authpost = new PostMethod(url.getFile());
-        authpost.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-        authpost.setRequestHeader("Accept","*/*");
+        PostMethod post = new PostMethod(url.getFile());
+        addHeaders(additionalHeaders, post);
+        post.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+        post.setRequestHeader("Accept","*/*");
         // Prepare login parameters
         NameValuePair[] valuePairs = new NameValuePair[query.size()];
         
@@ -232,10 +256,10 @@ public class HTTPUtils {
         }
         
         
-        authpost.setRequestBody(valuePairs);
+        post.setRequestBody(valuePairs);
         //authpost.setRequestEntity(new StringRequestEntity(requestEntity));
        
-        client.executeMethod(authpost);
+        client.executeMethod(post);
          
       
         
@@ -258,13 +282,13 @@ public class HTTPUtils {
         */
         // Usually a successful form-based login results in a redicrect to 
         // another url
-        int statuscode = authpost.getStatusCode();
+        int statuscode = post.getStatusCode();
         String toret = "";
         if ((statuscode == HttpStatus.SC_MOVED_TEMPORARILY) ||
             (statuscode == HttpStatus.SC_MOVED_PERMANENTLY) ||
             (statuscode == HttpStatus.SC_SEE_OTHER) ||
             (statuscode == HttpStatus.SC_TEMPORARY_REDIRECT)) {
-            Header header = authpost.getResponseHeader("location");
+            Header header = post.getResponseHeader("location");
             if (header != null) {
                 String newuri = header.getValue();
                 if ((newuri == null) || (newuri.equals(""))) {
@@ -284,7 +308,7 @@ public class HTTPUtils {
             }
         }else{
         	
-        	InputStream stream =  authpost.getResponseBodyAsStream();
+        	InputStream stream =  post.getResponseBodyAsStream();
         	byte[] bytes = new byte[1024];
         	int read = -1;
         	while((read=stream.read(bytes))!=-1){
@@ -293,7 +317,7 @@ public class HTTPUtils {
         	
         }
         // release any connection resources used by the method
-        authpost.releaseConnection();
+        post.releaseConnection();
         return toret;
         
         
