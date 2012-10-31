@@ -26,11 +26,11 @@ import org.apache.commons.httpclient.HttpException;
 
 
 @SuppressWarnings("serial")
-public class HTTPPost extends SimpleTransformer{
+public class HTTPPost extends URLBasedTransformer{
 
 	private String queryString; 
 	private String URL;
-	private String querySeparator=" ";
+	private String querySeparator="&";
 	boolean postDone = false;
 	
 	private boolean outputHTTPOutputs = false; //if false the output is the operator input, if true the output is the server output 
@@ -69,7 +69,7 @@ public class HTTPPost extends SimpleTransformer{
 		try {
 			
 			if (!this.postDone){
-				output = HTTPUtils.doPost(this.URL, this.queryString, this.querySeparator);
+				output = HTTPUtils.doPost(this.URL, this.queryString, this.querySeparator, this.getAdditionalHeaders());
 				
 			
 			}
@@ -133,6 +133,16 @@ public class HTTPPost extends SimpleTransformer{
 		}*/
 		httpPost.closeAllInputs();
 		
+	}
+	@Override
+	protected void _closeOneInput() {
+		this.getOutputHandler().outputFinished();
+		
+	}
+	
+	@Override
+	protected String[] _apply(String[] source) {
+		return source;
 	}
 
 }
