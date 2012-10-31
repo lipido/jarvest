@@ -16,5 +16,6 @@
 	<classpathentry kind="lib" path="lib-test/jetty-io-8.1.7.v20120910.jar"/>
 	<classpathentry kind="lib" path="lib-test/jetty-continuation-8.1.7.v20120910.jar"/>
 	<classpathentry kind="lib" path="lib-test/jetty-http-8.1.7.v20120910.jar"/>
+	<classpathentry kind="lib" path="lib/json.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
