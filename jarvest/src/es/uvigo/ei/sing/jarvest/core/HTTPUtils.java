@@ -68,7 +68,7 @@ public class HTTPUtils {
 	
 	private static HashMap<Thread, HttpClient> clients = new HashMap<Thread, HttpClient>();
 	
-	
+	public static String DEFAULT_USER_AGENT = "Mozilla/5.0 (compatible; jARVEST; +http://sing.ei.uvigo.es/jarvest)";
 	
 	private static HttpClient getClient(){
 		
@@ -78,7 +78,7 @@ public class HTTPUtils {
 			Protocol easyhttps = new Protocol("https", new EasySSLProtocolSocketFactory(), 443);
 			Protocol.registerProtocol("https", easyhttps);
 			if (System.getProperty("httpclient.useragent")==null){
-				System.getProperties().setProperty("httpclient.useragent", "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.11) Gecko/20071204 Ubuntu/7.10 (gutsy) Firefox/2.0.0.11");
+				System.getProperties().setProperty("httpclient.useragent", DEFAULT_USER_AGENT);
 			}
 			HttpClient client = new HttpClient();
 			if (System.getProperty("http.proxyHost")!=null && System.getProperty("http.proxyPort")!=null){ 
