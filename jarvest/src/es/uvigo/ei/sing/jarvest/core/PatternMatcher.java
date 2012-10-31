@@ -34,6 +34,7 @@ public class PatternMatcher extends AbstractTransformer {
 	
 	private Pattern pattern=Pattern.compile("", Pattern.DOTALL); 
 	private boolean dotAll=true;
+	private String ifNoMatch="--none--";
 	public PatternMatcher(){
 	
 		
@@ -66,6 +67,13 @@ public class PatternMatcher extends AbstractTransformer {
 	public boolean getDotAll(){
 		//System.err.println("getting dotall: "+this.dotAll);
 		return this.dotAll;
+	}
+	
+	public void setIfNoMatch(String ifNoMatch) {
+		this.ifNoMatch = ifNoMatch;
+	}
+	public String getIfNoMatch() {
+		return ifNoMatch;
 	}
 	
 	
@@ -104,9 +112,10 @@ public class PatternMatcher extends AbstractTransformer {
 		
 		String currentString = super.getAndClearCurrentString();
 		Matcher matcher = pattern.matcher(currentString.subSequence(0, currentString.length()));
-		//System.err.println(currentString);	
+		//System.err.println(currentString);
+		boolean hasMatches = false;
 		while(matcher.find()){
-		
+			hasMatches = true;
 			for (int i = 0; i< matcher.groupCount(); i++){
 					
 				super.getOutputHandler().pushOutput(matcher.group(i+1));
@@ -114,6 +123,10 @@ public class PatternMatcher extends AbstractTransformer {
 			}
 		}
 		
+		if (!hasMatches && !this.getIfNoMatch().equals("--none--")){
+			super.getOutputHandler().pushOutput(this.getIfNoMatch());
+			super.getOutputHandler().outputFinished();
+		}
 		
 	}
 
