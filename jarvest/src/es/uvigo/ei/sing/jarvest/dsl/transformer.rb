@@ -188,6 +188,7 @@ class PatternMatcher < Transformer
   custom_name "match"
   param :pattern, :required => true
   param :dotAll, :default_value => true
+  param :ifNoMatch, :required=>false, :default_value => "--none--"
 end
 
 # It defines the `xpath` call on *Language*. It can be used as
@@ -196,6 +197,7 @@ class Xpath < Transformer
   transformer_class :HTMLMatcher
   param :XPath, :required => true
   param :addTBody, :default_value => true
+  param :ifNoMatch, :required=>false, :default_value => "--none--"
 end
 
 # It defines the `xpath` call on *Language*. It can be used as
@@ -204,6 +206,7 @@ class Xpathscrap < Transformer
   transformer_class :HTMLMatcherScrap
   param :XPath, :required => true
   param :addTBody, :default_value => true
+  param :ifNoMatch, :required=>false, :default_value => "--none--"
 end
 
 # This is not intended to be used as a direct call on *Language*. It
@@ -219,21 +222,29 @@ class Appender < Transformer
   transformer_class :Appender
   param :append, :required => true, :default_value=>''
 end
+
+# It defines the base class for http based transformers: wget and post
+class URLTransformer < Transformer  
+  param :ajax, :required => false, :default_value => 'false'
+  param :headers, :required => false, :default_value => '{}'  
+  param :userAgent, :required => false, :default_value => ''
+end
+
 # It defines the `url` call on *Language*. `@@custom_names` on
 # transformer class is used to customize the name. It's used as `url`
 # or `url(:description=>'whatever')`
-class URLRetriever < Transformer
+class URLRetriever < URLTransformer
   custom_name "wget"
-  transformer_class :URLRetriever
+  transformer_class :URLRetriever  
 end
 
 # It defines the `post` call on *Language*. `@@custom_names` on
 # transformer class is used to customize the name. It's used as `url`
 # or `url(:description=>'whatever')`
-class Post < Transformer
+class Post < URLTransformer
   custom_name "post"
   transformer_class :HTTPPost
-  param :querySeparator, :required => false, :default_value => ' '
+  param :querySeparator, :required => false, :default_value => '&'
   param :outputHTTPOutputs, :required => false, :default_value => 'false'
   param :queryString, :required => true
   param :URL, :required => true
