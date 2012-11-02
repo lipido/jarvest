@@ -40,24 +40,32 @@ public class HTTPPost extends URLBasedTransformer{
 	}
 	public void setQuerySeparator(String querySeparator) {
 		this.querySeparator = querySeparator;
+		this.setChanged();
+		this.notifyObservers();
 	}
 	public boolean getOutputHTTPOutputs() {
 		return outputHTTPOutputs;
 	}
 	public void setOutputHTTPOutputs(boolean outputHTTPOutputs) {
 		this.outputHTTPOutputs = outputHTTPOutputs;
+		this.setChanged();
+		this.notifyObservers();
 	}
 	public String getQueryString() {
 		return queryString;
 	}
 	public void setQueryString(String queryString) {
 		this.queryString = queryString;
+		this.setChanged();
+		this.notifyObservers();
 	}
 	public String getURL() {
 		return URL;
 	}
 	public void setURL(String url) {
 		URL = url;
+		this.setChanged();
+		this.notifyObservers();
 	}
 	
 	
