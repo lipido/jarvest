@@ -63,6 +63,8 @@ public class HTMLMatcher extends AbstractTransformer {
 	
 	public void setAddTBody(boolean addTBody) {
 		this.addTBody = addTBody;
+		this.setChanged();
+		this.notifyObservers();
 	}
 	
 	public boolean isAddTBody() {
@@ -71,6 +73,8 @@ public class HTMLMatcher extends AbstractTransformer {
 	
 	public void setIfNoMatch(String ifNoMatch) {
 		this.ifNoMatch = ifNoMatch;
+		this.setChanged();
+		this.notifyObservers();
 	}
 	public String getIfNoMatch() {
 		return ifNoMatch;

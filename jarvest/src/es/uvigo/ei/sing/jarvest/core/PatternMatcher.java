@@ -71,6 +71,8 @@ public class PatternMatcher extends AbstractTransformer {
 	
 	public void setIfNoMatch(String ifNoMatch) {
 		this.ifNoMatch = ifNoMatch;
+		this.setChanged();
+		this.notifyObservers();
 	}
 	public String getIfNoMatch() {
 		return ifNoMatch;

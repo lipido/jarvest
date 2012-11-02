@@ -21,7 +21,6 @@ along with jARVEST Project.  If not, see <http://www.gnu.org/licenses/>.
 package es.uvigo.ei.sing.jarvest.core;
 
 import java.io.StringWriter;
-import java.util.LinkedList;
 
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -35,7 +34,6 @@ import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.HtmlTagProvider;
 import org.htmlcleaner.TagInfo;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class HTMLMatcherScrap extends AbstractTransformer {
@@ -68,6 +66,8 @@ public class HTMLMatcherScrap extends AbstractTransformer {
 	
 	public void setAddTBody(boolean addTBody) {
 		this.addTBody = addTBody;
+		this.setChanged();
+		this.notifyObservers();
 	}
 	
 	public boolean isAddTBody() {
@@ -76,6 +76,8 @@ public class HTMLMatcherScrap extends AbstractTransformer {
 	
 	public void setIfNoMatch(String ifNoMatch) {
 		this.ifNoMatch = ifNoMatch;
+		this.setChanged();
+		this.notifyObservers();
 	}
 	public String getIfNoMatch() {
 		return ifNoMatch;
