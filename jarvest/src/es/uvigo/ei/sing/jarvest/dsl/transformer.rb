@@ -209,6 +209,17 @@ class Xpathscrap < Transformer
   param :ifNoMatch, :required=>false, :default_value => "--none--"
 end
 
+# It defines the `select` call on *Language*. It can be used as
+# `select('#results a')` or `xpath(:Xpath->'//a/@href')`
+class Select < Transformer
+  transformer_class :Select
+  param :selector, :required => true  
+  param :ifNoMatch, :required=>false, :default_value => "--none--"
+  param :attribute, :required=>false, :default_value => ""
+  param :innerHTML, :required=>false, :default_value => "false"
+end
+
+
 # This is not intended to be used as a direct call on *Language*. It
 # acts as a container of other transformers. For that you should use
 # the special calls `pipe` and `branch` that accept blocks.
