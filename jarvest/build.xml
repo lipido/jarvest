@@ -57,7 +57,7 @@
 	        <jar destfile="${dist}/jarvest.jar">
 	            <manifest>
 	                <attribute name="Main-Class" value="es.uvigo.ei.sing.jarvest.JarvestApp"/>
-	                <attribute name="Class-Path" value=". jarvest_lib/commons-codec-1.3.jar jarvest_lib/commons-httpclient-3.1.jar jarvest_lib/commons-logging-1.1.1.jar jarvest_lib/htmlcleaner1_55.jar jarvest_lib/jruby-complete-1.6.7.jar jarvest_lib/yacli.jar"/>
+	                <attribute name="Class-Path" value=". jarvest_lib/json.jar jarvest_lib/jsoup-1.7.1.jar jarvest_lib/commons-codec-1.3.jar jarvest_lib/commons-httpclient-3.1.jar jarvest_lib/commons-logging-1.1.1.jar jarvest_lib/htmlcleaner1_55.jar jarvest_lib/jruby-complete-1.6.7.jar jarvest_lib/yacli.jar"/>
 	            </manifest>
 	            <fileset dir="${bin}"/>
 	        </jar>
@@ -67,7 +67,10 @@
 	        <copy file="${lib}/commons-httpclient-3.1.jar" todir="${dist}/jarvest_lib"/>
 	        <copy file="${lib}/commons-logging-1.1.1.jar" todir="${dist}/jarvest_lib"/>
 	        <copy file="${lib}/htmlcleaner1_55.jar" todir="${dist}/jarvest_lib"/>
-	        <copy file="${lib}/jruby-complete-1.6.7.jar" todir="${dist}/jarvest_lib"/>			
+	        <copy file="${lib}/jruby-complete-1.6.7.jar" todir="${dist}/jarvest_lib"/>
+			<copy file="${lib}/json.jar" todir="${dist}/jarvest_lib"/>		
+			<copy file="${lib}/jsoup-1.7.1.jar" todir="${dist}/jarvest_lib"/>
+			
 	        <copy file="${lib}/yacli.jar" todir="${dist}/jarvest_lib"/>
 	        
 	    </target>
