@@ -87,7 +87,7 @@ public class Decorator extends AbstractTransformer{
 	protected void _closeOneInput() {
 		if (closedInput){
 			//TODO: This exception appears sometimes.... may be caused by preceding transformers with empty outputs closing them without opening
-			throw new RuntimeException("closing too much!");
+			//throw new RuntimeException("closing too much!");
 		}
 		closedInput =true;
 		firstCall=true;

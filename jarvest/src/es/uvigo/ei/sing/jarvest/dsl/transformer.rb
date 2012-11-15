@@ -226,6 +226,12 @@ end
 class SimpleTransformer < Transformer
   transformer_class :SimpleTransformer
 end
+
+class OneShotTransformer < Transformer
+  custom_name "one_to_one"
+  transformer_class :OneShotTransformer
+end
+
 # It defines the `appender` call on *Language*. It can be used as
 # `appender('<br />')` or `appender(:append->'<br />')`
 class Appender < Transformer
@@ -585,14 +591,14 @@ class Language
 #	  }
 #	  decorate(:head=>'[site_open]', :tail=>'[site_close'])
 #
-  def one_to_one &block
-    one_to_one = Language.new SimpleTransformer.new(:BRANCH_SCATTERED, :ORDERED)
-    inside = Language.new SimpleTransformer.new, &block
-    inside.transformer.add_child (Language.new Merger.new).transformer
-    one_to_one.transformer.add_child inside.transformer
-    @transformer.add_child one_to_one.transformer
-    self
-  end
+#  def one_to_one &block
+#    one_to_one = Language.new OneShotTransformer.new()
+#    inside = Language.new SimpleTransformer.new, &block
+#    inside.transformer.add_child (Language.new Merger.new).transformer
+#    one_to_one.transformer.add_child inside.transformer
+#    @transformer.add_child one_to_one.transformer
+#    self
+#  end
   
 # It creates a new minilanguage scope with branch semantics. A branch
 # requires that its type and merge mode are specified as params. The

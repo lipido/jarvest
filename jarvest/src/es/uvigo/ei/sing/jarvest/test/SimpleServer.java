@@ -65,6 +65,7 @@ public class SimpleServer {
 	public int getPort(){
 		return HTTP_PORT;
 	}
+	//public void setRoot()
 	public void mapURL(String url, String content){
 		this.URLtoContent.put(url, content);		
 	}

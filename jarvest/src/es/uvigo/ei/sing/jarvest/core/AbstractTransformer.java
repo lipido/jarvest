@@ -293,6 +293,7 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 			
 		}
 		public void outputFinished(int childNumber) {
+			
 			if (branchType == CASCADE){
 				if (childNumber<childs.size()-1){
 					childs.get(childNumber+1).closeOneInput();
@@ -303,6 +304,7 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 				}
 			}
 			else if (branchMergeMode == ORDERED){
+				//System.out.println("finsihed: "+childNumber+ " current output: "+currentOutput );
 				if (childNumber == currentOutput){
 					outputHandler.outputFinished();
 					while (childQueues.get(childs.get(childNumber)).size()>1){
@@ -315,6 +317,7 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 				}
 			}
 			else if (branchMergeMode == SCATTERED){
+				
 				if (childNumber == currentOutput){
 					outputHandler.outputFinished();
 					childQueues.get(childs.get(childNumber));
@@ -335,6 +338,7 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 							if (queue.peek()!=null) outputHandler.pushOutput(queue.peek());
 							queue.remove(0);
 							queue.add(0, "");
+							
 							currentOutput = child;
 							break;
 						}else{
@@ -347,6 +351,7 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 						if (isLoop() && child ==0) child = 1;
 						queue = childQueues.get(childs.get(child));
 					}
+					
 					currentOutput = child;
 				}else{
 					childQueues.get(childs.get(childNumber)).offer(null);
@@ -393,6 +398,7 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 			
 		}
 		public void allFinished(int childNumber) {
+			
 			if (branchType == CASCADE){
 				if (childNumber<childs.size()-1){
 					childs.get(childNumber+1).closeAllInputs();
@@ -447,7 +453,8 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 				finishedChilds.add(childs.get(childNumber));
 				
 				if ((isLoop() && loopFinished==true && finishedChilds.size() == childs.size()-1) || (!isLoop() && finishedChilds.size() == childs.size())){
-					currentOutput = 0;//added 14/5/08
+					
+					//currentOutput = 0;//added 14/5/08 //removed 15/11/12
 				//	outputHandler.allFinished();
 				}
 				
@@ -719,7 +726,7 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 				}
 				if (branchType == BRANCH_SCATTERED){
 					childs.get((currentInput % childs.size())+firstChild).closeOneInput();
-					childs.get((currentInput % childs.size())+firstChild).closeAllInputs(); // CLOSING EACH CHILD IN EACH INPUT
+					//childs.get((currentInput % childs.size())+firstChild).closeAllInputs(); // CLOSING EACH CHILD IN EACH INPUT //removed 15/11/02
 				}
 			}else{
 				if (branchMergeMode != COLLAPSED)
@@ -749,7 +756,7 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 				if (branchType == BRANCH_SCATTERED){
 					for (int i = firstChild; i<childs.size(); i++){
 						//do nothing because we close childs in each input
-//						childs.get(i).closeAllInputs();
+						childs.get(i).closeAllInputs(); //enabled 15/11/2012
 					}
 					//childs.get((currentInput % childs.size())+firstChild).closeAllInputs();
 				}
