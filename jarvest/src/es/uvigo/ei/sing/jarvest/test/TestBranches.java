@@ -77,30 +77,25 @@ public class TestBranches {
 		assertEquals("b", results[2]);
 		assertEquals("d", results[3]);
 		
-		}
+	}
+	
 	@Test
-	public void testOne2One() throws Exception {
+	public void testOrderedUnbalanced() throws Exception {
 		Jarvest jarvest = new Jarvest();
-
-		
 		
 		String[] results = jarvest.exec(
-				"append('aa')\n"+
-				"append('aaa')\n"+
-								
-				"one_to_one{\n"+
-				"	match('(a)') \n merge \n decorate(:head=>'<found>',:tail=>'</found>') \n"+
-				//"	\n"+
-				"}"+
-				"");
+				"append('a')\n"+
+				"append('bb')\n"+
+				"append('a')\n"+
+				"append('bb')\n"+						
+				"branch(:BRANCH_SCATTERED, :ORDERED) {\n"+
+				"	match('(a)')\n"+
+				"	match('(b)')\n"+
+				"}");
 
-		System.out.println(Arrays.toString(results));
-		assertEquals("<found>aa</found>", results[0]);
-		assertEquals("<found>aaa</found>", results[1]);
+		assertEquals(Arrays.asList(new String[]{"a", "a", "b", "b", "b", "b"}), Arrays.asList(results));
 		
-		}
-
-
+	}
 
 }
 

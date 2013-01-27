@@ -121,6 +121,7 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 			childQueues.put(child, new LinkedList<String>());
 		}
 	}
+	
 	// an output handler that redirects to other transformer
 	private class ConnectedOutputHandler implements OutputHandler{
 		
@@ -660,7 +661,7 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 		
 	}
 	private OutputHandler outputHandler;
-	public final void setOutputHandler(OutputHandler handler){
+	public final void setOutputHandler(OutputHandler handler){		
 		this.outputHandler = handler;
 		if (!this.initiated){
 			this.init();
@@ -777,6 +778,9 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 	private OutputHandler localOutputHandler = null;
 	protected OutputHandler getOutputHandler(){
 		return this.localOutputHandler;
+	}
+	protected OutputHandler getNonLocalOutputHandler(){
+		return this.outputHandler;
 	}
 	
 	
