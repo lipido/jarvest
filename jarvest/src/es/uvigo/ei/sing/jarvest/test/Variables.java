@@ -22,6 +22,8 @@ package es.uvigo.ei.sing.jarvest.test;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
+
 import org.junit.Test;
 
 import es.uvigo.ei.sing.jarvest.core.SimpleTransformer;
@@ -48,6 +50,27 @@ public class Variables {
 		assertEquals("second input was "+input2, results[1]);
 	}
 	
-	
+	@Test
+	public void testIsolation() throws Exception {
+		
+		Jarvest jarvest = new Jarvest();
+		
+		
+		String[] results = jarvest.exec(
+				"append('a')\n"+
+				"append('b')\n"+								
+				"one_to_one{\n"+
+				"	setvar(:name=>'%%0%%', :value=>'defined %%0%%')\n" +
+				"}\n" +
+				"append(:append=>'%%a%%', :inputFilter=>'0-1')\n" +
+				"append('%%b%%')\n"+
+				
+				"");
+
+		System.out.println(Arrays.toString(results));
+		assertEquals(Arrays.asList(new String[]{"defined a", "defined b"}), Arrays.asList(results));
+		
+		
+	}	
 		
 }

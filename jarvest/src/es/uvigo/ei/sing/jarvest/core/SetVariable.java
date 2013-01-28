@@ -48,6 +48,8 @@ public class SetVariable extends AbstractTransformer {
 	@Override
 	protected void _closeAllInputs() {
 		if (!variableWasDefined) defineVariable();
+		
+		variableWasDefined = false;
 		super._closeAllInputs();
 	}
 	

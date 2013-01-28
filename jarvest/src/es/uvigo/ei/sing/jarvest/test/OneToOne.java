@@ -22,6 +22,8 @@ package es.uvigo.ei.sing.jarvest.test;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
+
 import org.junit.Test;
 
 import es.uvigo.ei.sing.jarvest.core.SimpleTransformer;
@@ -90,6 +92,19 @@ public class OneToOne {
 		assertEquals("<found>aa</found>", results[0]);
 		assertEquals("<found>aaa</found>", results[1]);
 	}
+	@Test
+	public void testIsolation() throws Exception {
+		Jarvest jarvest = new Jarvest();
 		
+		String[] results = jarvest.exec(
+				"append('a')\n"+
+				"append('b')\n"+
+								
+				"one_to_one{\n"+
+				"	decorate(:tail=>' is %%0%%')"+
+				"}");
+
+		assertEquals(Arrays.asList(new String[]{"a is a", "b is b"}), Arrays.asList(results));
+	}
 		
 }
