@@ -22,25 +22,34 @@ package es.uvigo.ei.sing.jarvest.test;
 
 import static org.junit.Assert.*;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import es.uvigo.ei.sing.jarvest.dsl.Jarvest;
 
 public class TestLoop {
 	
+	private static SimpleServer server;
 	
-	@Test
-	public void testLoop() throws Exception {
-		Jarvest jarvest = new Jarvest();
-
-		SimpleServer server = new SimpleServer();
+	@BeforeClass
+	public static void setupServer() throws Exception{
+		server = new SimpleServer();
 		server.mapURL("/page1.html",
 				"<b>Page 1 results</b><br>" +
 				"<a id=\"next\" href=\"/page2.html\">Next</a>"
 		);
 		server.mapURL("/page2.html", 
 				"<b>Page 2 results</b><br>");
-		
+	}
+	@AfterClass
+	public static void shutDownServer(){
+		server.shutDown();
+	}
+	@Test
+	public void testLoop() throws Exception {
+		Jarvest jarvest = new Jarvest();
+
 		String[] results = jarvest.exec("wget{ xpath('//b') }.repeat?{xpath('//a[@id=\"next\"]/@href') | decorate(:head=>'http://localhost:"+server.getPort()+"')}", "http://localhost:"+server.getPort()+"/page1.html");
 	
 		assertEquals(2, results.length);
@@ -49,5 +58,7 @@ public class TestLoop {
 		
 		
 	}
+	
+	
 
 }

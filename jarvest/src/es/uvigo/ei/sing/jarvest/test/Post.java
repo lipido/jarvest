@@ -20,50 +20,49 @@ along with jARVEST Project.  If not, see <http://www.gnu.org/licenses/>.
 */
 package es.uvigo.ei.sing.jarvest.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import es.uvigo.ei.sing.jarvest.dsl.Jarvest;
 
 public class Post {
 	
-	private SimpleServer server;
+	private static SimpleServer server;
 
-	@Before
-	public void setupServer(){
+	@BeforeClass
+	public static void setupServer(){
 		
 		try {
 			server = new SimpleServer();
+			server.mapURL("/login.php",
+					"Login successful",
+					"logged=true", //cookiedefs
+					null, //requires cookie
+					"password" //requires this post parameter
+			);
+			
+			server.mapURL("/inside.php", 
+					"This is your private page",
+					null, //cookiedefs
+					"logged", //requires this cookie
+					null
+					);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	@After
-	public void destroyServer(){
-		this.server.shutDown();
+	@AfterClass
+	public static void destroyServer(){
+		server.shutDown();
 	}
 	@Test
 	public void testLogin() throws Exception {
 		Jarvest jarvest = new Jarvest();
 
-		server.mapURL("/login.php",
-				"<b>Login successful</b><br>",
-				"logged=true", //cookiedefs
-				null, //requires cookie
-				"password" //requires this post parameter
-		);
-		
-		server.mapURL("/inside.php", 
-				"This is your private page",
-				null, //cookiedefs
-				"logged", //requires this cookie
-				null
-				);
-		
 		String[] results = jarvest.exec("post(:URL=>'http://localhost:"+server.getPort()+"/login.php', :queryString=>'password=foo')" +
 				"| append('http://localhost:"+server.getPort()+"/inside.php') | wget");
 	
@@ -77,21 +76,6 @@ public class Post {
 	public void testHTTPOutputs() throws Exception {
 		Jarvest jarvest = new Jarvest();
 
-	
-		server.mapURL("/login.php",
-				"Login successful",
-				"logged=true", //cookiedefs
-				null, //requires cookie
-				"password" //requires this post parameter
-		);
-		
-		server.mapURL("/inside.php", 
-				"This is your private page",
-				null, //cookiedefs
-				"logged", //requires this cookie
-				null
-				);
-		
 		String[] results = jarvest.exec("post(:URL=>'http://localhost:"+server.getPort()+"/login.php', :queryString=>'password=foo', :outputHTTPOutputs=>'true') |" +
 		
 						"branch(:BRANCH_SCATTERED, :ORDERED) { " +
