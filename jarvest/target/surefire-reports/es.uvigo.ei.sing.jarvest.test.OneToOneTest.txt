@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: es.uvigo.ei.sing.jarvest.test.OneToOneTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.143 sec
