@@ -73,36 +73,46 @@ public class HTTPPost extends URLBasedTransformer{
 	
 	@Override
 	protected void _pushString(String str){
-		String output = null;
-		try {
-			
+		if (!this.outputHTTPOutputs) this.getOutputHandler().pushOutput(str);
+	}
+	@Override
+	protected void _closeOneInput() {
 			if (!this.postDone){
-				output = HTTPUtils.doPost(this.URL, this.queryString, this.querySeparator, this.getAdditionalHeaders());
-				
-			
+				doPost(this.outputHTTPOutputs);
+				this.postDone = true;
 			}
-			this.postDone = true;
+			if (!this.outputHTTPOutputs){
+				//this.getOutputHandler().pushOutput(output);
+				this.getOutputHandler().outputFinished();
+			}
+		//this.getOutputHandler().outputFinished();	
+	}
+	private void doPost(boolean pushOutput){
+		String output;
+		try {
+			output = HTTPUtils.doPost(this.URL, this.queryString, this.querySeparator, this.getAdditionalHeaders());
+			if (pushOutput){
+				if (output!=null){
+					this.getOutputHandler().pushOutput(output);
+					this.getOutputHandler().outputFinished();
+					//super._pushString(output);
+				}
+			}
 		} catch (HttpException e) {
-			
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		if (this.outputHTTPOutputs){
-			if (output!=null){
-				
-				super._pushString(output);
-				
-			}
-		}
-		else{
-			super._pushString(str);
 		}
 	}
 	@Override
 	protected void _closeAllInputs(){
+		if (!this.postDone){
+			doPost(this.outputHTTPOutputs);
+		}
 		this.postDone = false;
+		//this.getOutputHandler().allFinished();
 		super._closeAllInputs();
 		
 	}
@@ -142,11 +152,7 @@ public class HTTPPost extends URLBasedTransformer{
 		httpPost.closeAllInputs();
 		
 	}
-	@Override
-	protected void _closeOneInput() {
-		this.getOutputHandler().outputFinished();
-		
-	}
+
 	
 	@Override
 	protected String[] _apply(String[] source) {
