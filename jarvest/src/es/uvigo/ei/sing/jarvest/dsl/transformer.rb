@@ -303,6 +303,15 @@ class Merger < Transformer
   transformer_class :Merger
 end
 
+# It defines the `setvar` call on *Language*. It's used as
+# `setvar(:name=> 'myvar', :value=>'%%1%%')`.
+class SetVariable < Transformer
+  custom_name "setvar"
+  transformer_class :SetVariable
+  param :name, :required => true
+  param :value, :required => true
+end
+
 # ### *Transformer* instantiation.
 
 # We reopen the *Transformer* class to show how it's instantiated. The

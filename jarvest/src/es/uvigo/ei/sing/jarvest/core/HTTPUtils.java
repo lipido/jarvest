@@ -220,8 +220,7 @@ public class HTTPUtils {
 		return doPost(urlstring, queryString, separator, new HashMap<String, String>());
 	}
 	public synchronized static String doPost(String urlstring, String queryString, String separator, Map<String, String> additionalHeaders) throws HttpException, IOException{
-		
-		
+		System.err.println("posting to: "+urlstring+". query string: "+queryString);
 		HashMap<String, String> query = parseQueryString(queryString, separator);
 		HttpClient client = getClient();
 		

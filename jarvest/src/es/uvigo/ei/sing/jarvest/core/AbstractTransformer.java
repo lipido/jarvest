@@ -35,6 +35,7 @@ import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -43,6 +44,8 @@ import java.util.Observable;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.naming.OperationNotSupportedException;
 
 
 
@@ -608,7 +611,8 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 	private boolean resolvedParameters = false;
 	private boolean tryResolveParameters() {
 		if (resolvedParameters) return true;
-		Pattern pattern = Pattern.compile("%%[0-9]+?%%");
+		//Pattern pattern = Pattern.compile("%%[0-9]+?%%");
+		Pattern pattern = Pattern.compile("%%[a-zA-Z0-9]+?%%");
 		boolean allResolved = true;
 		try{
 			BeanInfo info = java.beans.Introspector.getBeanInfo(this.getClass());
@@ -617,28 +621,34 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 				Method writeM = descriptor.getWriteMethod();
 				
 				if (readM != null && writeM !=null && descriptor.getPropertyType().equals(String.class)){
-					String lastValue = (String) readM.invoke(this, (Object[]) null);
-					if(lastValues.get(descriptor)==null) lastValues.put(descriptor, lastValue);
+					String finalValue = (String) readM.invoke(this, (Object[]) null);
+					if(lastValues.get(descriptor)==null) lastValues.put(descriptor, finalValue);
 					else continue;
 					//expand expression
 					boolean resolved=true;
-					Matcher matcher = pattern.matcher(lastValue);
+					Matcher matcher = pattern.matcher(finalValue);
 					while(matcher.find() && resolved){
 						int start = matcher.start();
 						int end = matcher.end();
-						String number = lastValue.substring(start+2,end-2);
-						System.err.println("Number: "+number);
-						int position = Integer.parseInt(number);
-						if (stoppedInputs.size()-1>position){
-							lastValue = lastValue.substring(0,start) + stoppedInputs.get(position) + lastValue.substring(end);
-						}else{				
-							allResolved = false;
-							resolved=false;
+						String variableName = finalValue.substring(start+2,end-2);
+						
+						
+						try{
+							int position = Integer.parseInt(variableName);
+							if (stoppedInputs.size()-1>position){
+								finalValue = finalValue.substring(0,start) + stoppedInputs.get(position) + finalValue.substring(end);
+							}else{				
+								allResolved = false;
+								resolved=false;
+							}	
+						}catch(NumberFormatException e){
+							finalValue = finalValue.substring(0,start) + SetVariable.getVariableValue(variableName) + finalValue.substring(end);
 						}
-						matcher = pattern.matcher(lastValue);
+						
+						matcher = pattern.matcher(finalValue);
 					}
 					
-					if (resolved) writeM.invoke(this, new Object[]{lastValue});
+					if (resolved) writeM.invoke(this, new Object[]{finalValue});
 					else lastValues.remove(descriptor); 
 				}
 				
@@ -794,6 +804,7 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 //==================================
 //	END NEW EXECUTION MODEL
 //=================================	
+	@Deprecated
 	public final String[] apply(String[] source) {
 		expandParameters(source);
 		
@@ -946,8 +957,11 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 	 * looks for %%<number>%% substrings, expanding them with the content of the source[<number>] string
 	 * @param source
 	 */
+	@Deprecated
 	private void expandParameters(String[] source) {
+		
 		Pattern pattern = Pattern.compile("%%[0-9]+?%%");
+		//Pattern pattern = Pattern.compile("%%[a-zA-Z0-9]+?%%");
 		try{
 			BeanInfo info = java.beans.Introspector.getBeanInfo(this.getClass());
 			for (PropertyDescriptor descriptor : info.getPropertyDescriptors()){
@@ -955,23 +969,28 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 				Method writeM = descriptor.getWriteMethod();
 				
 				if (readM != null && writeM !=null && descriptor.getPropertyType().equals(String.class)){
-					String lastValue = (String) readM.invoke(this, (Object[]) null);
-					lastValues.put(descriptor, lastValue);
+					String finalValue = (String) readM.invoke(this, (Object[]) null);
+					lastValues.put(descriptor, finalValue);
 					
 					//expand expression
-					Matcher matcher = pattern.matcher(lastValue);
+					Matcher matcher = pattern.matcher(finalValue);
 					while(matcher.find()){
 						int start = matcher.start();
 						int end = matcher.end();
-						String number = lastValue.substring(start+2,end-2);
-						int position = Integer.parseInt(number);
-						if (source.length>position){
-							lastValue = lastValue.substring(0,start) + source[position] + lastValue.substring(end);
+						String variableName = finalValue.substring(start+2,end-2);
+						System.err.println("found variable name: "+variableName);
+						try{
+							int position = Integer.parseInt(variableName);
+							if (source.length>position){
+								finalValue = finalValue.substring(0,start) + source[position] + finalValue.substring(end);
+							}
+							matcher = pattern.matcher(finalValue);
+						}catch(NumberFormatException nfe){
+							finalValue = finalValue.substring(0,start) + SetVariable.getVariableValue(variableName) + finalValue.substring(end);
 						}
-						matcher = pattern.matcher(lastValue);
 					}
 					
-					writeM.invoke(this, new Object[]{lastValue});
+					writeM.invoke(this, new Object[]{finalValue});
 				}
 				
 			}
@@ -1017,7 +1036,11 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 		this.notifyObservers();
 	}
 	
-	protected abstract String[] _apply(String [] source);
+	@Deprecated
+	protected String[] _apply(String [] source){
+		//this model is deprected
+		throw new UnsupportedOperationException();
+	}
 
 	public void setBranchMergeMode(MergeMode mergeMode) {
 		this.branchMergeMode = mergeMode;
@@ -1228,3 +1251,4 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 		return toret;
 	}
 }
+
