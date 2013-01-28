@@ -350,6 +350,7 @@ class Transformer
 # We set instance attributes from the params. Notice that if the value
 # is not present, the default values are used.
     @description = params[:description]
+    @inputFilter = params[:inputFilter]
     @branchtype = params[:branchtype].to_sym
     @branchmergemode = params[:branchmergemode].to_sym
     @loop = params[:loop]
@@ -362,7 +363,7 @@ class Transformer
 # The default values used for the standard parameters. If the value
 # are equal to these they don't have to be provided.
   @@default_values = {:branchtype => :CASCADE, :branchmergemode => :ORDERED,
-    :loop => false}
+    :loop => false, :inputFilter=> ''}
 
 # Create a new hash with the contents of `hash` and that fallbacks to
 # `@@defaults_values` and the param definition if some key is not
