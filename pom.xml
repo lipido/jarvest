@@ -6,7 +6,6 @@
 	<artifactId>jarvest</artifactId>
 	<version>1.0</version>
 	<packaging>jar</packaging>
-	<!-- library dependencies -->
 	<repositories>
 		<repository>
 			<id>my</id>
