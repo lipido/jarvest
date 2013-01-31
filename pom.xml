@@ -7,7 +7,7 @@
 	<version>1.0</version>
 	<packaging>jar</packaging>
 	<!-- library dependencies -->
-
+<!-- I like comments -->
 
 	<repositories>
 		<repository>
