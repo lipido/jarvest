@@ -6,16 +6,16 @@
 	<artifactId>jarvest</artifactId>
 	<version>1.0</version>
 	<packaging>jar</packaging>
-	<!-- library dependencies -->
-
-
+	
+	<!-- repositories -->
 	<repositories>
 		<repository>
 			<id>my</id>
 			<url>file://${basedir}/localrepo</url>
 		</repository>
 	</repositories>
-
+	
+	<!-- library dependencies -->
 	<dependencies>
 		<dependency>
 			<!-- coordinates of the required library -->
