@@ -46,7 +46,6 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.httpclient.ConnectTimeoutException;
-import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpClientError;
@@ -55,7 +54,6 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
-import org.apache.commons.httpclient.cookie.CookieSpec;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpConnectionParams;
@@ -75,6 +73,7 @@ public class HTTPUtils {
 		// one client per thread
 		if (clients.get(Thread.currentThread())== null){
 			
+			@SuppressWarnings("deprecation")
 			Protocol easyhttps = new Protocol("https", new EasySSLProtocolSocketFactory(), 443);
 			Protocol.registerProtocol("https", easyhttps);
 			if (System.getProperty("httpclient.useragent")==null){
@@ -94,8 +93,6 @@ public class HTTPUtils {
 		}
 		return clients.get(Thread.currentThread());
 	}
-	private static int reading = 0;
-	private static String gettingContent = "";
 	public static InputStream getURLBody(final String url, StringBuffer charset) throws IOException{
 		return getURLBody(url, charset, new HashMap<String, String>());
 	}
@@ -265,11 +262,14 @@ public class HTTPUtils {
         // See if we got any cookies
         // The only way of telling whether logon succeeded is 
         // by finding a session cookie
+        /*
         CookieSpec cookiespec = CookiePolicy.getDefaultSpec();
+        
+        
         Cookie[] logoncookies = cookiespec.match(
             url.getHost(), port, "/", false, client.getState().getCookies());
         
-        /*
+        
         System.out.println("Logon cookies:");    
         if (logoncookies.length == 0) {
             System.out.println("None");    
