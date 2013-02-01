@@ -20,58 +20,89 @@ along with jARVEST Project.  If not, see <http://www.gnu.org/licenses/>.
 */
 package es.uvigo.ei.sing.jarvest.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import es.uvigo.ei.sing.jarvest.core.OutputHandler;
 import es.uvigo.ei.sing.jarvest.dsl.Jarvest;
 
+
 public class URLTest {
 
+private static SimpleServer server;
+	
+	@BeforeClass
+	public static void setupServer() throws Exception{
+		server = new SimpleServer();
+		server.mapURL("/index.html",
+				"<html><body>" +
+				"<a href='link1'>link1</a>" +
+				"<a href='link2'>link2</a>" +
+				"</body></html>"
+		);
+		server.mapURL("/page2.html", 
+				"<b>Page 2 results</b><br>");
+	}
+	@AfterClass
+	public static void shutDownServer(){
+		server.shutDown();
+	}
+	
 	@Test
 	public void test() {
 		Jarvest jarvest = new Jarvest();
 		String[] results = jarvest.exec(
 				"wget | xpath('//a/@href')", //robot!			
-				"http://www.google.com" //inputs
+				"http://localhost:"+server.getPort()+"/index.html" //inputs
 				
 		);
 		
-		for (String result: results){
-			System.out.println(result);
-		}
+		assertEquals(Arrays.asList(new String[]{"link1", "link2"}), Arrays.asList(results));
 		
 	}
 	@Test
 	public void testOutputHandler() {
 		Jarvest jarvest = new Jarvest();
 		
+		class Conditions{
+			int outputFinished = 0;
+			boolean allFinished = false;
+		}
+		final Conditions conditions = new Conditions();
 		jarvest.exec(
 				"wget | xpath('//a/@href')", //robot! 
 				new OutputHandler(){
 
 					@Override
 					public void pushOutput(String string) {
-						System.out.print(string);
+						assertTrue(string.startsWith("link"));
 						
 					}
 
 					@Override
 					public void outputFinished() {
-						System.out.println("[one output has finished]");
+						conditions.outputFinished ++;
 						
 					}
 
 					@Override
 					public void allFinished() {
-						System.out.println("[the harvester has finished]");
+						conditions.allFinished = true;
 						
 					}
 					
 				},
-				"http://www.google.com" //inputs
+				"http://localhost:"+server.getPort()+"/index.html" //inputs
 				
 		);
-		
+		assertTrue(conditions.allFinished);
+		assertEquals(2, conditions.outputFinished);
 	}
 
 }
