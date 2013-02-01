@@ -26,9 +26,6 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import es.uvigo.ei.sing.jarvest.core.SimpleTransformer;
-import es.uvigo.ei.sing.jarvest.core.Transformer;
-import es.uvigo.ei.sing.jarvest.core.Util;
 import es.uvigo.ei.sing.jarvest.dsl.Jarvest;
 
 public class VariablesTest {
