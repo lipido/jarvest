@@ -222,18 +222,6 @@ public class Jarvest {
                 "http://www.google.com")) {
             System.out.println(s);
         }
-        // String asLanguage = Minilanguage.xmlToLanguage(new URL(
-        // "http://sing.ei.uvigo.es:8080/aautomator/_microRNA.xml")
-        // .openConnection().getInputStream());
-        // System.out.println(asLanguage);
-        // try {
-        // String[] exec = Minilanguage.exec(
-        // "url | xpath('ññ//asdfasf/@asdfafd') ",
-        // "http://www.google.es");
-        // System.out.println(Arrays.toString(exec));
-        // } catch (Exception e) {
-        // e.printStackTrace();
-        // }
 
     }
 
