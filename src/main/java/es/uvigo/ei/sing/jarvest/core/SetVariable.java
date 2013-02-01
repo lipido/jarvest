@@ -89,6 +89,10 @@ public class SetVariable extends AbstractTransformer {
 		
 		return value;
 	}
+	public static boolean isDefined(String name){
+		Map<String, String> variablesMap = variables.get();
+		return variablesMap.containsKey(name);
+	}
 	
 
 }

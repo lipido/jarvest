@@ -528,7 +528,7 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 		}
 		
 		
-		if (tryResolveParameters()){
+		if (tryResolveParameters(false)){
 			if (isFiltered(currentInput)){
 				return;
 			}
@@ -551,10 +551,10 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 //		System.err.println(this.description+" | closed one input");
 		
 		boolean resolvedPrior = resolvedParameters;
-		if (!tryResolveParameters()){
+		if (!tryResolveParameters(false)){
 			stoppedInputs.add(null);
 		}
-		if (tryResolveParameters()){
+		if (tryResolveParameters(false)){
 			if (!resolvedPrior){
 				//dump previous inputs
 				for (int i = 0; i<stoppedInputs.size()-1; i++){
@@ -573,6 +573,7 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 			currentInput++;
 		}
 	}
+
 	
 	
 	int closeAllCount = 0;
@@ -582,24 +583,23 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 		}
 		
 //		System.err.println(this.description+" | closed all");
-		// IF I AM A LOOP, I FINISH ONLY WHEN THE FIRST CHILD DOESN'T GIVES ANYTHING, THERE WILL BE TWO CALLS TO CLOSE		
-		if (!resolvedParameters && !tryResolveParameters()){
+		// IF I AM A LOOP, I FINISH ONLY WHEN THE FIRST CHILD DOESN'T GIVES ANYTHING, THERE WILL BE TWO CALLS TO CLOSE	
+		boolean resolvedPrior = resolvedParameters;
+		if (!resolvedPrior && !tryResolveParameters(true)){
 			throw new RuntimeException("input finished before resolved parameters");
 		}else{
+			if (!resolvedPrior){
+				for (int i = 0; i<stoppedInputs.size()-1; i++){
+					if (!isFiltered(i)){
+						this.pushString(stoppedInputs.get(i));
+						this._closeOneInput();
+					}
+					currentInput++;
+				}
+			}
 			try{
-			closeAllCount++;
-		
-			/*if (isLoop() && closeAllCount == 2){
-				
+				closeAllCount++;		
 				this._closeAllInputs();
-				this.initiated=false;
-			}else if (isLoop()){
-				this._closeAllInputs();
-			}else if (!isLoop()){
-				this._closeAllInputs();
-				this.initiated=false;
-			}*/
-			this._closeAllInputs();
 			}finally{
 				this.resetParameters();
 				this.initiated=false;
@@ -609,10 +609,10 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 	}
 	
 	private boolean resolvedParameters = false;
-	private boolean tryResolveParameters() {
+	private boolean tryResolveParameters(boolean isClosingAllInputs) {
 		if (resolvedParameters) return true;
 		//Pattern pattern = Pattern.compile("%%[0-9]+?%%");
-		Pattern pattern = Pattern.compile("%%[a-zA-Z0-9]+?%%");
+		Pattern pattern = Pattern.compile("%%[^\\?%][^%]*?%%");
 		boolean allResolved = true;
 		try{
 			BeanInfo info = java.beans.Introspector.getBeanInfo(this.getClass());
@@ -630,19 +630,38 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 					while(matcher.find() && resolved){
 						int start = matcher.start();
 						int end = matcher.end();
-						String variableName = finalValue.substring(start+2,end-2);
-						
-						
+						String expression = finalValue.substring(start+2,end-2);
+						String defaultValue = null;
+						String variableName = expression;
+						if (expression.contains("?")){
+							variableName = expression.substring(0, expression.indexOf("?"));
+							if (expression.indexOf("?") == expression.length()-1){
+								defaultValue = "";
+							}else{
+								defaultValue = expression.substring(expression.indexOf("?")+1);
+							}
+						}						
 						try{
 							int position = Integer.parseInt(variableName);
 							if (stoppedInputs.size()-1>position){
 								finalValue = finalValue.substring(0,start) + stoppedInputs.get(position) + finalValue.substring(end);
-							}else{				
-								allResolved = false;
-								resolved=false;
+							}else{	
+								if (isClosingAllInputs && defaultValue!=null){
+									finalValue = finalValue.substring(0,start) + defaultValue + finalValue.substring(end);
+								}else{
+									allResolved = false;
+									resolved=false;
+								}
 							}	
 						}catch(NumberFormatException e){
-							finalValue = finalValue.substring(0,start) + SetVariable.getVariableValue(variableName) + finalValue.substring(end);
+							if (SetVariable.isDefined(variableName)){
+								finalValue = finalValue.substring(0,start) + SetVariable.getVariableValue(variableName) + finalValue.substring(end);
+							}else if (defaultValue != null){
+								finalValue = finalValue.substring(0,start) + defaultValue + finalValue.substring(end);
+							}else{
+								allResolved = false;
+								resolved = false;
+							}
 						}
 						
 						matcher = pattern.matcher(finalValue);

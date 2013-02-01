@@ -72,5 +72,65 @@ public class VariablesTest {
 		
 		
 	}	
+
+	@Test
+	public void testVariablesAndFilters() throws Exception {
+		Jarvest jarvest = new Jarvest();
 		
+		String[] results = jarvest.exec(
+				"append(:append=>'%%0%%', :inputFilter=>'0')\n"+
+				"", new String[]{"input"});
+		
+		assertEquals(Arrays.asList(new String[]{"input"}), Arrays.asList(results));
+		
+		results = jarvest.exec(
+				"append(:append=>'%%1%%')\n"+
+				"", new String[]{"input", "two"});
+		
+		assertEquals(Arrays.asList(new String[]{"input", "two", "two"}), Arrays.asList(results));
+	}
+	@Test
+	public void testDefaultValueInputNumber() throws Exception {
+		Jarvest jarvest = new Jarvest();
+		
+		String[] results = jarvest.exec(
+				"append('%%0?noinput%%')\n"+				
+				"");
+		
+		assertEquals(1, results.length);
+		assertEquals("noinput", results[0]);
+		
+		results = jarvest.exec(
+				"append('%%0?%%')\n"+				
+				"");
+		assertEquals(1, results.length);
+		assertEquals("", results[0]);
+		
+		results = jarvest.exec(
+				"append(:append=>'%%0%%', :inputFilter=>'0')\n"+				
+				"append('%%8000?found_only_one_input%%')\n"+
+				"", new String[] {"first_input"});
+		assertEquals(Arrays.asList(new String[]{"first_input", "found_only_one_input"}), Arrays.asList(results));
+		
+	}
+
+	@Test
+	public void testDefaultValueVariable() throws Exception {
+		Jarvest jarvest = new Jarvest();
+		
+		String[] results = jarvest.exec(
+				"append('%%undefinedvariable?defaultvalue%%')\n"+				
+				"");
+		
+		assertEquals(1, results.length);
+		assertEquals("defaultvalue", results[0]);
+		
+		results = jarvest.exec(
+				"append('%%undefinedvariable?%%')\n"+				
+				"");
+		assertEquals(1, results.length);
+		assertEquals("", results[0]);
+	}
+	
+
 }
