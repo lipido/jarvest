@@ -23,7 +23,6 @@ package es.uvigo.ei.sing.jarvest;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import es.uvigo.ei.sing.jarvest.dsl.Jarvest;
 import es.uvigo.ei.sing.yacli.AbstractCommand;
