@@ -7,7 +7,7 @@
 
 	<groupId>es.uvigo.ei.sing</groupId>
 	<artifactId>jarvest</artifactId>
-	<version>0.2-develop</version>
+	<version>0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
  	<repositories>
