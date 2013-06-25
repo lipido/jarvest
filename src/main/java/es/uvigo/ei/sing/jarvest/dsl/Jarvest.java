@@ -88,7 +88,7 @@ public class Jarvest {
     private final ScriptingContainer engine;
 
     public Jarvest() {
-        engine = new ScriptingContainer(LocalContextScope.SINGLETHREAD);
+        engine = new ScriptingContainer(LocalContextScope.SINGLETHREAD);        
         engine.setCompatVersion(CompatVersion.RUBY1_9);
         engine.runScriptlet(TRANSFORMER_RB);
     }

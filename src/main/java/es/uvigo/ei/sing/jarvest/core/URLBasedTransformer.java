@@ -32,6 +32,7 @@ import org.json.JSONTokener;
 public abstract class URLBasedTransformer extends AbstractTransformer {
 
 	private boolean ajax = false;
+	private boolean binary = false;
 	private String userAgent = "";
 	private String headers = "{}";
 	
@@ -75,6 +76,13 @@ public abstract class URLBasedTransformer extends AbstractTransformer {
 			throw new IllegalArgumentException("unable to parse headers parameters (must be a json string)", e);
 		}
 		return toret;
+	}
+	
+	public boolean isBinary() {
+		return binary;
+	}
+	public void setBinary(boolean binary) {
+		this.binary = binary;
 	}
 	
 }

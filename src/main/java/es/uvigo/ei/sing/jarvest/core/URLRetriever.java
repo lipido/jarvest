@@ -20,6 +20,7 @@ along with jARVEST Project.  If not, see <http://www.gnu.org/licenses/>.
 */
 package es.uvigo.ei.sing.jarvest.core;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -85,15 +86,23 @@ public class URLRetriever extends URLBasedTransformer{
 			String charset = validCharset(charsetb.toString());
 			//System.out.println(charset);
 			input = new InputStreamReader(is, Charset.forName(charset));
-			char[] bytes = new char[1024];
+			char[] chars = new char[1024];
 			int readed = 0;
 			
-			
-			
-			while ((readed=input.read(bytes))!=-1 && !this.isStopped()){
+			System.err.println("is binary: "+this.isBinary());
+			if (!this.isBinary()){
+				while ((readed=input.read(chars))!=-1 && !this.isStopped()){
+					this.getOutputHandler().pushOutput(new String(chars,0,readed));
+				}
+			}else{
+				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+				byte[] bytes = new byte[1024];
+
+				while ((readed=is.read(bytes))!=-1 && !this.isStopped()){
+					bos.write(bytes,0,readed);
+				}
 				
-				this.getOutputHandler().pushOutput(new String(bytes,0,readed));
-			
+				this.getOutputHandler().pushOutput(new String(Base64Coder.encode(bos.toByteArray())));
 			}
 			
 			/*String res = HTTPUtils.getURLBodyAsString(current);

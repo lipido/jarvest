@@ -243,6 +243,7 @@ end
 # It defines the base class for http based transformers: wget and post
 class URLTransformer < Transformer  
   param :ajax, :required => false, :default_value => 'false'
+  param :binary, :required => false, :default_value => 'false'
   param :headers, :required => false, :default_value => '{}'  
   param :userAgent, :required => false, :default_value => ''
 end

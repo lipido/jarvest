@@ -20,6 +20,7 @@ along with jARVEST Project.  If not, see <http://www.gnu.org/licenses/>.
 */
 package es.uvigo.ei.sing.jarvest.core;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -30,6 +31,7 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -213,10 +215,10 @@ public class HTTPUtils {
 			
 		}
 	}
-	public synchronized static String doPost(String urlstring, String queryString, String separator) throws HttpException, IOException{
-		return doPost(urlstring, queryString, separator, new HashMap<String, String>());
+	public synchronized static String doPost(String urlstring, String queryString, String separator, boolean binary) throws HttpException, IOException{
+		return doPost(urlstring, queryString, separator, new HashMap<String, String>(), binary);
 	}
-	public synchronized static String doPost(String urlstring, String queryString, String separator, Map<String, String> additionalHeaders) throws HttpException, IOException{
+	public synchronized static String doPost(String urlstring, String queryString, String separator, Map<String, String> additionalHeaders, boolean binary) throws HttpException, IOException{
 		System.err.println("posting to: "+urlstring+". query string: "+queryString);
 		HashMap<String, String> query = parseQueryString(queryString, separator);
 		HttpClient client = getClient();
@@ -308,15 +310,23 @@ public class HTTPUtils {
         }else{
         	
         	InputStream stream =  post.getResponseBodyAsStream();
+        	ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        	
         	byte[] bytes = new byte[1024];
         	int read = -1;
         	while((read=stream.read(bytes))!=-1){
-        		toret+=new String(bytes,0,read);
+        		bos.write(bytes, 0, read);
         	}
         	
+        	if (binary){
+            	toret = new String(Base64Coder.encode(bos.toByteArray()));
+            }else{
+            	toret = new String(bos.toByteArray());
+            }
         }
         // release any connection resources used by the method
         post.releaseConnection();
+        
         return toret;
         
         

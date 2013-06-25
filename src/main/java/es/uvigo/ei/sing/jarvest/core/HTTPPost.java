@@ -90,7 +90,7 @@ public class HTTPPost extends URLBasedTransformer{
 	private void doPost(boolean pushOutput){
 		String output;
 		try {
-			output = HTTPUtils.doPost(this.URL, this.queryString, this.querySeparator, this.getAdditionalHeaders());
+			output = HTTPUtils.doPost(this.URL, this.queryString, this.querySeparator, this.getAdditionalHeaders(), this.isBinary());
 			if (pushOutput){
 				if (output!=null){
 					this.getOutputHandler().pushOutput(output);
