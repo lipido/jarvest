@@ -89,7 +89,6 @@ public class URLRetriever extends URLBasedTransformer{
 			char[] chars = new char[1024];
 			int readed = 0;
 			
-			System.err.println("is binary: "+this.isBinary());
 			if (!this.isBinary()){
 				while ((readed=input.read(chars))!=-1 && !this.isStopped()){
 					this.getOutputHandler().pushOutput(new String(chars,0,readed));
