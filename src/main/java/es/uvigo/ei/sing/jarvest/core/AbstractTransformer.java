@@ -47,9 +47,7 @@ import java.util.regex.Pattern;
 
 
 public abstract class AbstractTransformer extends Observable implements Transformer{
-
-	
-	
+	private static final long serialVersionUID = 20130204L;
 	
 	private Vector<Transformer> childs = new Vector<Transformer>();
 	private MergeMode branchMergeMode = ORDERED;
@@ -59,10 +57,6 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 	private String inputFilter ="";
 	
 	private Vector<Filter> inputFilters = new Vector<Filter>();
-	/**
-	 *	Serial Version UID 
-	 */
-	private static final long serialVersionUID = 1L;
 
 	public void add(Transformer child) {
 		this.add(child, this.childs.size());
@@ -80,10 +74,8 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 	
 	@Override
 	public Object clone(){
-		
-		
 		try {
-//			 field-by-field assignment (the specific transformers have only fields that can be cloned by simple assignment, because
+			// field-by-field assignment (the specific transformers have only fields that can be cloned by simple assignment, because
 			// they are String, or primitive types)
 			AbstractTransformer _clone = (AbstractTransformer) super.clone();
 			// clone the vectors
@@ -98,14 +90,12 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 			
 			_clone.stopped = false;
 			_clone.initiated = false;
-			//System.out.println("Cloning "+this+" clone: "+_clone);
+			
 			return _clone;
 			
 		} catch (CloneNotSupportedException e) {
 			throw new RuntimeException(e);
 		}
-		
-		
 	}
 
 //=================================
