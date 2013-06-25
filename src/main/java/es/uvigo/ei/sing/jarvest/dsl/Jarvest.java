@@ -38,6 +38,7 @@ import java.security.Permissions;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.security.cert.Certificate;
+import java.util.List;
 import java.util.PropertyPermission;
 
 import org.jruby.CompatVersion;
@@ -91,8 +92,16 @@ public class Jarvest {
         engine = new ScriptingContainer(LocalContextScope.SINGLETHREAD);        
         engine.setCompatVersion(CompatVersion.RUBY1_9);
         engine.runScriptlet(TRANSFORMER_RB);
+        
     }
-
+    
+    public Jarvest(List<String> jRubyLoadPaths){
+    	engine = new ScriptingContainer(LocalContextScope.SINGLETHREAD);
+    	engine.setLoadPaths(jRubyLoadPaths);
+        engine.setCompatVersion(CompatVersion.RUBY1_9);
+        engine.runScriptlet(TRANSFORMER_RB);
+    }
+    
     public Transformer eval(File file) {
         return eval(file, Charset.forName("utf8"));
     }
