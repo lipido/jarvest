@@ -70,30 +70,31 @@ public class HTTPUtils {
 	
 	public static String DEFAULT_USER_AGENT = "Mozilla/5.0 (compatible; jARVEST; +http://sing.ei.uvigo.es/jarvest)";
 	
+	public static void clearCookies(){
+		clients.put(Thread.currentThread(), createClient());
+	}
 	private static HttpClient getClient(){
-		
 		// one client per thread
 		if (clients.get(Thread.currentThread())== null){
-			
-			@SuppressWarnings("deprecation")
-			Protocol easyhttps = new Protocol("https", new EasySSLProtocolSocketFactory(), 443);
-			Protocol.registerProtocol("https", easyhttps);
-			if (System.getProperty("httpclient.useragent")==null){
-				System.getProperties().setProperty("httpclient.useragent", DEFAULT_USER_AGENT);
-			}
-			HttpClient client = new HttpClient();
-			if (System.getProperty("http.proxyHost")!=null && System.getProperty("http.proxyPort")!=null){ 
-				client.getHostConfiguration().setProxy(System.getProperty("http.proxyHost"), Integer.parseInt(System.getProperty("http.proxyPort")));
-			}
-			clients.put(Thread.currentThread(), client);
-			client.getParams().setCookiePolicy(CookiePolicy.BROWSER_COMPATIBILITY);
-			
-			client.getParams().setBooleanParameter("http.protocol.single-cookie-header",true);
-			
-			
-			
+			clients.put(Thread.currentThread(), createClient());
 		}
 		return clients.get(Thread.currentThread());
+	}
+	private static HttpClient createClient() {
+		@SuppressWarnings("deprecation")
+		Protocol easyhttps = new Protocol("https", new EasySSLProtocolSocketFactory(), 443);
+		Protocol.registerProtocol("https", easyhttps);
+		if (System.getProperty("httpclient.useragent")==null){
+			System.getProperties().setProperty("httpclient.useragent", DEFAULT_USER_AGENT);
+		}
+		HttpClient client = new HttpClient();
+		if (System.getProperty("http.proxyHost")!=null && System.getProperty("http.proxyPort")!=null){ 
+			client.getHostConfiguration().setProxy(System.getProperty("http.proxyHost"), Integer.parseInt(System.getProperty("http.proxyPort")));
+		}
+		client.getParams().setCookiePolicy(CookiePolicy.BROWSER_COMPATIBILITY);
+		
+		client.getParams().setBooleanParameter("http.protocol.single-cookie-header",true);
+		return client;
 	}
 	public static InputStream getURLBody(final String url, StringBuffer charset) throws IOException{
 		return getURLBody(url, charset, new HashMap<String, String>());
