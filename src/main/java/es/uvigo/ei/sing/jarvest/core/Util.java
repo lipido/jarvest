@@ -37,8 +37,6 @@ public class Util {
 	}
 	
 	public static String[] runRobot(Transformer robot, String[] input, OutputHandler outputHandler) {
-		HTTPUtils.clearCookies();
-		
 		final LinkedList<String> output = new LinkedList<String>();
 
 		if (outputHandler == null){
