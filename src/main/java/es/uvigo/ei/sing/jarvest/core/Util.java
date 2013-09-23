@@ -37,6 +37,7 @@ public class Util {
 	}
 	
 	public static String[] runRobot(Transformer robot, String[] input, OutputHandler outputHandler) {
+		HTTPUtils.clearCookies();
 		
 		final LinkedList<String> output = new LinkedList<String>();
 
@@ -77,6 +78,7 @@ public class Util {
 		
 		String[] toret = new String[output.size()];
 		output.toArray(toret);
+		
 		
 		return toret;
 
