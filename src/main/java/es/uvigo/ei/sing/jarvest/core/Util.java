@@ -31,34 +31,42 @@ public class Util {
 		Transformer robot = XMLInputOutput.loadTransformer(Util.class.getResourceAsStream(resourcePath));
 		return runRobot(robot, input);
 	}
+
 	public static String[] runRobot(Transformer robot, String[] input) {
+		return runRobot(robot, input, null);
+	}
+	
+	public static String[] runRobot(Transformer robot, String[] input, OutputHandler outputHandler) {
 		
 		final LinkedList<String> output = new LinkedList<String>();
 
-		class MyOutputHandler implements OutputHandler{
-
-			private String currentResult = "";
-
-			public void allFinished() {
+		if (outputHandler == null){
+			class MyOutputHandler implements OutputHandler{
 				
-
-			}
-
-			public void outputFinished() {
-				output.add(this.currentResult);
-				this.currentResult = "";
+				private String currentResult = "";
+				
+				public void allFinished() {
 					
+					
+				}
 				
-			}
-
-			public void pushOutput(String arg0) {
-				currentResult+=arg0;
+				public void outputFinished() {
+					output.add(this.currentResult);
+					this.currentResult = "";
+					
+					
+				}
 				
-			}
-						
-		};
-		MyOutputHandler automatorHandler = new MyOutputHandler();
-		robot.setOutputHandler(automatorHandler);
+				public void pushOutput(String arg0) {
+					currentResult+=arg0;
+					
+				}
+				
+			};
+			outputHandler = new MyOutputHandler();
+		
+		}
+		robot.setOutputHandler(outputHandler);
 		
 		for (String string : input){
 			robot.pushString(string);
@@ -73,24 +81,5 @@ public class Util {
 		return toret;
 
 	}
-	public static String[] runRobot(Transformer robot, String[] input, OutputHandler handler) {
-		
-		final LinkedList<String> output = new LinkedList<String>();
 
-		
-		robot.setOutputHandler(handler);
-		
-		for (String string : input){
-			robot.pushString(string);
-			robot.closeOneInput();
-		}
-		
-		robot.closeAllInputs();
-		
-		String[] toret = new String[output.size()];
-		output.toArray(toret);
-		
-		return toret;
-
-	}
 }
