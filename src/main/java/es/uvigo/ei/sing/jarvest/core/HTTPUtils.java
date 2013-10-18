@@ -105,31 +105,9 @@ public class HTTPUtils {
         
         addHeaders(additionalHeaders, get);
         
-        
-       
-	       /* synchronized(HTTPUtils.class){
-	        	System.out.println("Trying to get "+url);
-	        	while (reading>0){
-	        		try {
-	        			
-	        			System.out.println("getting "+url+". Somebody using the http client, waiting. Currently reading: "+reading+" url reading: "+gettingContent);
-	        			HTTPUtils.class.wait();
-	        			System.out.println("getting "+url+". Stop waiting for http client");
-	        		} catch (InterruptedException e) {
-	        			// TODO Auto-generated catch block
-	        			e.printStackTrace();
-	        		}
-	        	}
-	        	reading++;
-	        	gettingContent = url.toString();
-	        }*/
 	    try{
-	    //	System.out.println("Executing method get for url "+url);
-	    	
 	        client.executeMethod(get);
-	       // System.out.println("Executed method! "+url);
 	        charset.append(get.getResponseCharSet());
-	        //System.out.println("charset response is: "+charset);
 	        
 	        final InputStream in = get.getResponseBodyAsStream();
 	        return new InputStream(){
@@ -142,21 +120,11 @@ public class HTTPUtils {
 	        	@Override
 	        	public void close(){				
 	        		get.releaseConnection();
-	        		/*synchronized(HTTPUtils.class){
-	        			if (reading>0) reading--;
-	        			System.out.println("Getted content of "+url+" notifying others waiting. Currently reading: "+reading);
-	        			HTTPUtils.class.notify();
-	        		}*/
 	        	}
 	        	
 	        };
         }
         catch(Exception e){
-        	/*synchronized(HTTPUtils.class){
-    			if (reading>0) reading--;
-    			System.out.println("Getting an exception getting "+url+" notifying others waiting. Currently reading: "+reading);
-    			HTTPUtils.class.notify();
-    		}*/
         	throw new RuntimeException(e);
         }
 	}
@@ -194,20 +162,6 @@ public class HTTPUtils {
 			while( (readed =reader.read(characters))!=-1){
 				sbuf.append(characters, 0, readed);
 			}
-			
-			/*
-			
-			StringBuffer buffer = new StringBuffer(1024);
-			
-			
-			byte[] bytes = new byte[1024];
-			int readed=0;
-			while ((readed=in.read(bytes))!=-1){
-				
-				buffer.append(new String(bytes, 0, readed, charset));
-			}
-			return new String(buffer);*/
-			//System.out.println("Content getted from: "+url);
 			return sbuf.toString();
 		}finally{
 			
@@ -259,30 +213,6 @@ public class HTTPUtils {
        
         client.executeMethod(post);
          
-      
-        
-        // See if we got any cookies
-        // The only way of telling whether logon succeeded is 
-        // by finding a session cookie
-        /*
-        CookieSpec cookiespec = CookiePolicy.getDefaultSpec();
-        
-        
-        Cookie[] logoncookies = cookiespec.match(
-            url.getHost(), port, "/", false, client.getState().getCookies());
-        
-        
-        System.out.println("Logon cookies:");    
-        if (logoncookies.length == 0) {
-            System.out.println("None");    
-        } else {
-            for (int i = 0; i < logoncookies.length; i++) {
-                System.out.println("- " + logoncookies[i].toString());    
-            }
-        }
-        */
-        // Usually a successful form-based login results in a redicrect to 
-        // another url
         int statuscode = post.getStatusCode();
         InputStream toret = null;
         if ((statuscode == HttpStatus.SC_MOVED_TEMPORARILY) ||
@@ -295,13 +225,6 @@ public class HTTPUtils {
                 if ((newuri == null) || (newuri.equals(""))) {
                     newuri = "/";
                 }
-                
-             //   System.out.println("Redirect target: " + newuri); 
-        /*        GetMethod get2 = new GetMethod(url.getFile()+"/"+newuri);
-                
-                client.executeMethod(get2);
-                toret = get2.getResponseBodyAsString();
-                get2.releaseConnection();*/
                 
             } else {
                 System.out.println("Invalid redirect");
@@ -321,11 +244,6 @@ public class HTTPUtils {
 	        	@Override
 	        	public void close(){				
 	        		post.releaseConnection();
-	        		/*synchronized(HTTPUtils.class){
-	        			if (reading>0) reading--;
-	        			System.out.println("Getted content of "+url+" notifying others waiting. Currently reading: "+reading);
-	        			HTTPUtils.class.notify();
-	        		}*/
 	        	}
 	        	
 	        };
@@ -333,13 +251,9 @@ public class HTTPUtils {
         }
         
         return toret;
-        
-        
 	}
 	private static HashMap<String, String> parseQueryString(String query, String separator){
 		HashMap<String, String> toret = new HashMap<String, String>();
-		
-		
 		for(String pair : query.split(separator)){
 			int index = pair.indexOf("=");
 			if (index!=-1 && index<pair.length()){
@@ -348,23 +262,15 @@ public class HTTPUtils {
 			
 				// some replacements
 				value = value.replaceAll("%3D", "=").replaceAll("%3D", "=").replaceAll("%20", " ");
-				
 				toret.put(key, value);
 			}
-			
 			else{
 				System.err.println("ignoring string as a valid key-value pair: "+pair);
 				continue;
 			}
-			
 		}
-		
-		
 		return toret;
-		
 	}
-	
-	
 }
 class EasySSLProtocolSocketFactory implements SecureProtocolSocketFactory {
 
