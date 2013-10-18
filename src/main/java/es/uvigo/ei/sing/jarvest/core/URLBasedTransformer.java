@@ -20,6 +20,7 @@ along with jARVEST Project.  If not, see <http://www.gnu.org/licenses/>.
 */
 package es.uvigo.ei.sing.jarvest.core;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -35,6 +36,7 @@ public abstract class URLBasedTransformer extends AbstractTransformer {
 	private boolean binary = false;
 	private String userAgent = "";
 	private String headers = "{}";
+	private String charset = "";
 	
 	public boolean isAjax() {
 		return ajax;
@@ -85,4 +87,31 @@ public abstract class URLBasedTransformer extends AbstractTransformer {
 		this.binary = binary;
 	}
 	
+	public String getCharset() {
+		return charset;
+	}
+	public void setCharset(String charset) {
+		this.charset = charset;
+	}
+	
+	/**
+	 * If this.getCharset() == "" checks if the parameter charset is in Charset.availableCharset(), else it returns
+	 * Charset.defaultCharset().name();
+	 * 
+	 * If this.getCharset() != "" ignores charset
+	 * @param charset
+	 * @return
+	 */
+	protected String configureCharset(String charset) {
+		if (!this.getCharset().equals("")){
+			return findCharset(this.getCharset());
+		}else{
+			return findCharset(charset);
+		}		
+	}
+	private String findCharset(String charset){
+		String input = charset.toUpperCase();
+		if (Charset.availableCharsets().containsKey(input)){ return input;
+		}else return Charset.defaultCharset().name();
+	}
 }

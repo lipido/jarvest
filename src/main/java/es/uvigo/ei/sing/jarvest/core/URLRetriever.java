@@ -33,7 +33,7 @@ public class URLRetriever extends URLBasedTransformer{
 	 * Serial Version UID
 	 */
 	private static final long serialVersionUID = 1L;
-	private static final String DEFAULT_CHARSET = Charset.defaultCharset().name();
+
 
 	@Override
 	protected String[] _apply(String[] source) {
@@ -83,8 +83,8 @@ public class URLRetriever extends URLBasedTransformer{
 			
 			//System.out.println("getting url body "+current);
 			is = HTTPUtils.getURLBody(current, charsetb, this.getAdditionalHeaders());
-			String charset = validCharset(charsetb.toString());
-			//System.out.println(charset);
+			String charset = configureCharset(charsetb.toString());
+			
 			input = new InputStreamReader(is, Charset.forName(charset));
 			char[] chars = new char[1024];
 			int readed = 0;
@@ -125,12 +125,7 @@ public class URLRetriever extends URLBasedTransformer{
 	}
 
 
-	private String validCharset(String string) {
-		
-		String input = string.toUpperCase();
-		if (Charset.availableCharsets().containsKey(input)){ return input;
-		}else return DEFAULT_CHARSET;
-	}
+	
 
 	
 }

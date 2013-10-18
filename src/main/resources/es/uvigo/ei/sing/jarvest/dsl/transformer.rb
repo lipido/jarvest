@@ -246,6 +246,7 @@ class URLTransformer < Transformer
   param :binary, :required => false, :default_value => 'false'
   param :headers, :required => false, :default_value => '{}'  
   param :userAgent, :required => false, :default_value => ''
+  param :charset, :required => false, :default_value => ''
 end
 
 # It defines the `url` call on *Language*. `@@custom_names` on

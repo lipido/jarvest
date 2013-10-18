@@ -20,7 +20,9 @@ along with jARVEST Project.  If not, see <http://www.gnu.org/licenses/>.
 */
 package es.uvigo.ei.sing.jarvest.core;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.apache.commons.httpclient.HttpException;
 
@@ -88,12 +90,28 @@ public class HTTPPost extends URLBasedTransformer{
 		//this.getOutputHandler().outputFinished();	
 	}
 	private void doPost(boolean pushOutput){
-		String output;
+		InputStream stream;
+		String toret = null;
 		try {
-			output = HTTPUtils.doPost(this.URL, this.queryString, this.querySeparator, this.getAdditionalHeaders(), this.isBinary());
+			StringBuffer charsetb = new StringBuffer();
+			stream = HTTPUtils.doPost(this.URL, this.queryString, this.querySeparator, this.getAdditionalHeaders(), charsetb);
+			String charset = this.configureCharset(charsetb.toString());
 			if (pushOutput){
-				if (output!=null){
-					this.getOutputHandler().pushOutput(output);
+				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	        	
+	        	byte[] bytes = new byte[1024];
+	        	int read = -1;
+	        	while((read=stream.read(bytes))!=-1){
+	        		bos.write(bytes, 0, read);
+	        	}
+	        	
+	        	if (this.isBinary()){
+	            	toret = new String(Base64Coder.encode(bos.toByteArray()));
+	            }else{
+	            	toret = new String(bos.toByteArray(), charset);
+	            }
+				if (stream!=null){
+					this.getOutputHandler().pushOutput(toret);
 					this.getOutputHandler().outputFinished();
 					//super._pushString(output);
 				}

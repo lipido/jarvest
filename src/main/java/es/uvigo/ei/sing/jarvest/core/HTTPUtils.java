@@ -20,7 +20,6 @@ along with jARVEST Project.  If not, see <http://www.gnu.org/licenses/>.
 */
 package es.uvigo.ei.sing.jarvest.core;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -31,7 +30,6 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -132,6 +130,7 @@ public class HTTPUtils {
 	       // System.out.println("Executed method! "+url);
 	        charset.append(get.getResponseCharSet());
 	        //System.out.println("charset response is: "+charset);
+	        
 	        final InputStream in = get.getResponseBodyAsStream();
 	        return new InputStream(){
 	        	
@@ -216,10 +215,10 @@ public class HTTPUtils {
 			
 		}
 	}
-	public synchronized static String doPost(String urlstring, String queryString, String separator, boolean binary) throws HttpException, IOException{
-		return doPost(urlstring, queryString, separator, new HashMap<String, String>(), binary);
+	public synchronized static InputStream doPost(String urlstring, String queryString, String separator, StringBuffer charsetb) throws HttpException, IOException{
+		return doPost(urlstring, queryString, separator, new HashMap<String, String>(), charsetb);
 	}
-	public synchronized static String doPost(String urlstring, String queryString, String separator, Map<String, String> additionalHeaders, boolean binary) throws HttpException, IOException{
+	public synchronized static InputStream doPost(String urlstring, String queryString, String separator, Map<String, String> additionalHeaders, StringBuffer charsetb) throws HttpException, IOException{
 		System.err.println("posting to: "+urlstring+". query string: "+queryString);
 		HashMap<String, String> query = parseQueryString(queryString, separator);
 		HttpClient client = getClient();
@@ -239,7 +238,7 @@ public class HTTPUtils {
         client.getHostConfiguration().setHost(url.getHost(), port, url.getProtocol());
         client.getParams().setCookiePolicy(CookiePolicy.BROWSER_COMPATIBILITY);
         
-        PostMethod post = new PostMethod(url.getFile());
+        final PostMethod post = new PostMethod(url.getFile());
         addHeaders(additionalHeaders, post);
         post.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
         post.setRequestHeader("Accept","*/*");
@@ -285,7 +284,7 @@ public class HTTPUtils {
         // Usually a successful form-based login results in a redicrect to 
         // another url
         int statuscode = post.getStatusCode();
-        String toret = "";
+        InputStream toret = null;
         if ((statuscode == HttpStatus.SC_MOVED_TEMPORARILY) ||
             (statuscode == HttpStatus.SC_MOVED_PERMANENTLY) ||
             (statuscode == HttpStatus.SC_SEE_OTHER) ||
@@ -309,24 +308,29 @@ public class HTTPUtils {
                 System.exit(1);
             }
         }else{
+        	charsetb.append(post.getResponseCharSet());
+        	final InputStream in = post.getResponseBodyAsStream(); 
         	
-        	InputStream stream =  post.getResponseBodyAsStream();
-        	ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        	toret = new InputStream(){
+	        	
+	        	@Override
+	        	public int read() throws IOException {
+	        		return in.read();
+	        	}
+	        	
+	        	@Override
+	        	public void close(){				
+	        		post.releaseConnection();
+	        		/*synchronized(HTTPUtils.class){
+	        			if (reading>0) reading--;
+	        			System.out.println("Getted content of "+url+" notifying others waiting. Currently reading: "+reading);
+	        			HTTPUtils.class.notify();
+	        		}*/
+	        	}
+	        	
+	        };
         	
-        	byte[] bytes = new byte[1024];
-        	int read = -1;
-        	while((read=stream.read(bytes))!=-1){
-        		bos.write(bytes, 0, read);
-        	}
-        	
-        	if (binary){
-            	toret = new String(Base64Coder.encode(bos.toByteArray()));
-            }else{
-            	toret = new String(bos.toByteArray());
-            }
         }
-        // release any connection resources used by the method
-        post.releaseConnection();
         
         return toret;
         
