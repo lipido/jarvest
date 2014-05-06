@@ -22,6 +22,8 @@ package es.uvigo.ei.sing.jarvest.test;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -36,11 +38,11 @@ public class LoopTest {
 	public static void setupServer() throws Exception{
 		server = new SimpleServer();
 		server.mapURL("/page1.html",
-				"<b>Page 1 results</b><br>" +
+				"<b>Page 1 results</b><b>bold text</b><br>" +
 				"<a id=\"next\" href=\"/page2.html\">Next</a>"
 		);
 		server.mapURL("/page2.html", 
-				"<b>Page 2 results</b><br>");
+				"<b>Page 2 results</b><b>bold text</b><br>");
 	}
 	@AfterClass
 	public static void shutDownServer(){
@@ -50,8 +52,10 @@ public class LoopTest {
 	public void testLoop() throws Exception {
 		Jarvest jarvest = new Jarvest();
 
-		String[] results = jarvest.exec("wget{ xpath('//b') }.repeat?{xpath('//a[@id=\"next\"]/@href') | decorate(:head=>'http://localhost:"+server.getPort()+"')}", "http://localhost:"+server.getPort()+"/page1.html");
+		String[] results = jarvest.exec("wget{ xpath('//b') | decorate(:inputFilter=>'1') }.repeat?{xpath('//a[@id=\"next\"]/@href') | decorate(:head=>'http://localhost:"+server.getPort()+"')}", "http://localhost:"+server.getPort()+"/page1.html");
 	
+		System.out.println(Arrays.asList(results));
+		
 		assertEquals(2, results.length);
 		assertEquals("Page 1 results", results[0]);
 		assertEquals("Page 2 results", results[1]);

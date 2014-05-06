@@ -134,6 +134,7 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 	}
 	private boolean initiated = false;
 	private boolean loopFinished = false;
+	
 	private void init(){
 		//System.out.println("initiating "+this);
 	/*	try{
@@ -153,14 +154,13 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 				boolean anyOutput = false;
 				
 				@Override
-				public void pushOutput(String str){
+				public void pushOutput(String str){					
 					anyOutput = true;
-				
 					super.pushOutput(str);
 				}
 				@Override
 				public void outputFinished() {
-				
+					AbstractTransformer.this.resetCurrentInputNumber();
 					super.outputFinished();
 				}
 				@Override
@@ -201,6 +201,13 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 				});
 			}
 			//last child if it exists, forwards outputs to the general output transformer					
+		}
+	}
+	
+	private void resetCurrentInputNumber(){
+		this.currentInput = 0;
+		for (Transformer child : this.getChilds()){
+			((AbstractTransformer) child).resetCurrentInputNumber();
 		}
 	}
 	
