@@ -90,7 +90,7 @@ public class HTTPPost extends URLBasedTransformer{
 		//this.getOutputHandler().outputFinished();	
 	}
 	private void doPost(boolean pushOutput){
-		InputStream stream;
+		InputStream stream = null;
 		String toret = null;
 		try {
 			StringBuffer charsetb = new StringBuffer();
@@ -122,6 +122,14 @@ public class HTTPPost extends URLBasedTransformer{
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			if (stream!=null) {
+				try {
+					stream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 	@Override
