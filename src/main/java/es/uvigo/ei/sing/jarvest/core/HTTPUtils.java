@@ -52,6 +52,7 @@ import org.apache.commons.httpclient.HttpClientError;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -85,7 +86,7 @@ public class HTTPUtils {
 		if (System.getProperty("httpclient.useragent")==null){
 			System.getProperties().setProperty("httpclient.useragent", DEFAULT_USER_AGENT);
 		}
-		HttpClient client = new HttpClient();
+		HttpClient client = new HttpClient(new MultiThreadedHttpConnectionManager());
 		if (System.getProperty("http.proxyHost")!=null && System.getProperty("http.proxyPort")!=null){ 
 			client.getHostConfiguration().setProxy(System.getProperty("http.proxyHost"), Integer.parseInt(System.getProperty("http.proxyPort")));
 		}
@@ -106,6 +107,7 @@ public class HTTPUtils {
         addHeaders(additionalHeaders, get);
         
 	    try{
+	    	
 	        client.executeMethod(get);
 	        charset.append(get.getResponseCharSet());
 	        
@@ -222,14 +224,21 @@ public class HTTPUtils {
             Header header = post.getResponseHeader("location");
             if (header != null) {
                 String newuri = header.getValue();
+                
                 if ((newuri == null) || (newuri.equals(""))) {
                     newuri = "/";
                 }
-                
+                if(!newuri.startsWith("http")){
+		  newuri = url.getProtocol()+"://"+url.getHost()+"/"+url.getPath();
+                }
+                System.err.println("Following redirection to "+newuri);
+                post.releaseConnection();
+		return doPost(newuri, queryString, separator, additionalHeaders, charsetb);    
             } else {
                 System.out.println("Invalid redirect");
                 System.exit(1);
             }
+            
         }else{
         	charsetb.append(post.getResponseCharSet());
         	final InputStream in = post.getResponseBodyAsStream(); 
