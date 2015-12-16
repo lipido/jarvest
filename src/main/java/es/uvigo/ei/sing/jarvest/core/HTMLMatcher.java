@@ -20,8 +20,13 @@ along with jARVEST Project.  If not, see <http://www.gnu.org/licenses/>.
 */
 package es.uvigo.ei.sing.jarvest.core;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.LinkedList;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -32,6 +37,7 @@ import org.htmlcleaner.HtmlTagProvider;
 import org.htmlcleaner.TagInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class HTMLMatcher extends AbstractTransformer {
 
@@ -44,7 +50,7 @@ public class HTMLMatcher extends AbstractTransformer {
 	private String xpath=""; 
 	private boolean addTBody=true;
 	private String ifNoMatch="--none--";
-	
+	private boolean htmlClean = true;
 	public HTMLMatcher(){
 		
 	}
@@ -71,6 +77,15 @@ public class HTMLMatcher extends AbstractTransformer {
 		return addTBody;
 	}
 	
+	public void setHtmlClean(boolean htmlClean) {
+		System.err.println("setting html clean: "+htmlClean);
+		this.htmlClean = htmlClean;
+	}
+	
+	public boolean isHtmlClean() {
+		return htmlClean;
+	}
+	
 	public void setIfNoMatch(String ifNoMatch) {
 		this.ifNoMatch = ifNoMatch;
 		this.setChanged();
@@ -89,10 +104,8 @@ public class HTMLMatcher extends AbstractTransformer {
 			
 			//clean HTML
 			
-			final HtmlCleaner cleaner = new HtmlCleaner(currentString);
 			try {
-				cleaner.clean();
-				Document document = cleaner.createDOM();
+				Document document = createDocument(currentString);
 				
 				XPathFactory factory = XPathFactory.newInstance();
 				XPath xpath = factory.newXPath();
@@ -113,6 +126,33 @@ public class HTMLMatcher extends AbstractTransformer {
 		outputList.toArray(toret);
 		return toret;
 	}
+
+
+	private Document createDocument(String currentString) throws IOException, ParserConfigurationException, SAXException {
+		if (this.htmlClean) {
+			@SuppressWarnings("serial")		
+			class MyTagProvider extends HtmlTagProvider{
+				MyTagProvider(){
+					super();
+					
+					//not insert tbody before all tr (removing the +tbody rule)
+					if (!isAddTBody()){
+						super.addTag("tr", TagInfo.CONTENT_ALL, TagInfo.BODY, "!table,^thead,^tfoot,#td,#th,tr,td,th,caption,colgroup");
+					}
+					
+				}
+			};
+			final HtmlCleaner cleaner = new HtmlCleaner(currentString, new MyTagProvider());
+			cleaner.clean();
+			System.err.println(cleaner.getBrowserCompactXmlAsString());
+			Document document = cleaner.createDOM();
+			return document;
+		} else {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			return builder.parse(new ByteArrayInputStream(currentString.getBytes()));
+		}
+	}
 	
 	public String toString(){
 		String toret="";
@@ -129,24 +169,11 @@ public class HTMLMatcher extends AbstractTransformer {
 		
 		String currentString = super.getAndClearCurrentString();
 		
-		@SuppressWarnings("serial")		
-		class MyTagProvider extends HtmlTagProvider{
-			MyTagProvider(){
-				super();
-				
-				//not insert tbody before all tr (removing the +tbody rule)
-				if (!isAddTBody()){
-					super.addTag("tr", TagInfo.CONTENT_ALL, TagInfo.BODY, "!table,^thead,^tfoot,#td,#th,tr,td,th,caption,colgroup");
-				}
-				
-			}
-		};
-		final HtmlCleaner cleaner = new HtmlCleaner(currentString,new MyTagProvider());
 		
 		try {
-			cleaner.clean();
-			Document document = cleaner.createDOM();
-			//System.err.println(cleaner.getBrowserCompactXmlAsString());
+			
+			Document document = this.createDocument(currentString);
+			
 			XPathFactory factory = XPathFactory.newInstance();
 			XPath xpath = factory.newXPath();
 			XPathExpression expr = xpath.compile(this.xpath);

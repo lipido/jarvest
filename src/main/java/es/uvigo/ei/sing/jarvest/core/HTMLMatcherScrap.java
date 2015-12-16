@@ -20,8 +20,13 @@ along with jARVEST Project.  If not, see <http://www.gnu.org/licenses/>.
 */
 package es.uvigo.ei.sing.jarvest.core;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.StringWriter;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -35,6 +40,7 @@ import org.htmlcleaner.HtmlTagProvider;
 import org.htmlcleaner.TagInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class HTMLMatcherScrap extends AbstractTransformer {
 
@@ -47,6 +53,7 @@ public class HTMLMatcherScrap extends AbstractTransformer {
 	private String xpath=""; 
 	private boolean addTBody=true;
 	private String ifNoMatch="--none--";
+	private boolean htmlClean=true;
 	
 	public HTMLMatcherScrap(){
 		
@@ -72,6 +79,14 @@ public class HTMLMatcherScrap extends AbstractTransformer {
 	
 	public boolean isAddTBody() {
 		return addTBody;
+	}
+	
+	public void setHtmlClean(boolean htmlClean) {
+		this.htmlClean = htmlClean;
+	}
+	
+	public boolean isHtmlClean() {
+		return htmlClean;
 	}
 	
 	public void setIfNoMatch(String ifNoMatch) {
@@ -103,24 +118,8 @@ public class HTMLMatcherScrap extends AbstractTransformer {
 		
 		String currentString = super.getAndClearCurrentString();
 		
-		@SuppressWarnings("serial")		
-		class MyTagProvider extends HtmlTagProvider{
-			MyTagProvider(){
-				super();
-				
-				//not insert tbody before all tr (removing the +tbody rule)
-				if (!isAddTBody()){
-					super.addTag("tr", TagInfo.CONTENT_ALL, TagInfo.BODY, "!table,^thead,^tfoot,#td,#th,tr,td,th,caption,colgroup");
-				}
-				
-			}
-		};
-		final HtmlCleaner cleaner = new HtmlCleaner(currentString,new MyTagProvider());
-		
 		try {
-			cleaner.clean();
-			Document document = cleaner.createDOM();
-			//System.err.println(cleaner.getBrowserCompactXmlAsString());
+			Document document = createDocument(currentString);
 			XPathFactory factory = XPathFactory.newInstance();
 			XPath xpath = factory.newXPath();
 			XPathExpression expr = xpath.compile(this.xpath);
@@ -150,6 +149,32 @@ public class HTMLMatcherScrap extends AbstractTransformer {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}		
+	}
+	
+	private Document createDocument(String currentString) throws IOException, ParserConfigurationException, SAXException {
+		if (this.htmlClean) {
+			@SuppressWarnings("serial")		
+			class MyTagProvider extends HtmlTagProvider{
+				MyTagProvider(){
+					super();
+					
+					//not insert tbody before all tr (removing the +tbody rule)
+					if (!isAddTBody()){
+						super.addTag("tr", TagInfo.CONTENT_ALL, TagInfo.BODY, "!table,^thead,^tfoot,#td,#th,tr,td,th,caption,colgroup");
+					}
+					
+				}
+			};
+			final HtmlCleaner cleaner = new HtmlCleaner(currentString, new MyTagProvider());
+			cleaner.clean();
+			System.err.println(cleaner.getBrowserCompactXmlAsString());
+			Document document = cleaner.createDOM();
+			return document;
+		} else {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			return builder.parse(new ByteArrayInputStream(currentString.getBytes()));
+		}
 	}
 	
 

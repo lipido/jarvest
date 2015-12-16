@@ -197,6 +197,7 @@ class Xpath < Transformer
   transformer_class :HTMLMatcher
   param :XPath, :required => true
   param :addTBody, :default_value => true
+  param :htmlClean, :default_value => true
   param :ifNoMatch, :required=>false, :default_value => "--none--"
 end
 
@@ -206,6 +207,7 @@ class Xpathscrap < Transformer
   transformer_class :HTMLMatcherScrap
   param :XPath, :required => true
   param :addTBody, :default_value => true
+  param :htmlClean, :default_value => true
   param :ifNoMatch, :required=>false, :default_value => "--none--"
 end
 
