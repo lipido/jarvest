@@ -69,6 +69,12 @@ public class HTTPUtils {
 	
 	public static String DEFAULT_USER_AGENT = "Mozilla/5.0 (compatible; jARVEST; +http://sing.ei.uvigo.es/jarvest)";
 	
+	public static String MAX_CONNECTIONS_PER_HOST_PARAM	= "jarvest.http.max-connections-per-host";
+	public static String MAX_CONNECTIONS_PARAM	= "jarvest.http.max-connections";
+	
+	public static int DEFAULT_MAX_CONNECTIONS = 100;
+	public static int DEFAULT_MAX_CONNECTIONS_PER_HOST=10;
+	
 	public static void clearCookies(){
 		clients.put(Thread.currentThread(), createClient());
 	}
@@ -86,7 +92,12 @@ public class HTTPUtils {
 		if (System.getProperty("httpclient.useragent")==null){
 			System.getProperties().setProperty("httpclient.useragent", DEFAULT_USER_AGENT);
 		}
-		HttpClient client = new HttpClient(new MultiThreadedHttpConnectionManager());
+		MultiThreadedHttpConnectionManager httpConnectionManager = new MultiThreadedHttpConnectionManager();
+		int maxConnectionsPerHost = getMaxConnectionsPerHost();
+		int maxConnections = getMaxConnections();
+		httpConnectionManager.getParams().setDefaultMaxConnectionsPerHost(maxConnectionsPerHost);
+		httpConnectionManager.getParams().setMaxTotalConnections(maxConnections);
+		HttpClient client = new HttpClient(httpConnectionManager);
 		if (System.getProperty("http.proxyHost")!=null && System.getProperty("http.proxyPort")!=null){ 
 			client.getHostConfiguration().setProxy(System.getProperty("http.proxyHost"), Integer.parseInt(System.getProperty("http.proxyPort")));
 		}
@@ -94,6 +105,20 @@ public class HTTPUtils {
 		
 		client.getParams().setBooleanParameter("http.protocol.single-cookie-header",true);
 		return client;
+	}
+	private static int getMaxConnections() {
+		if (System.getProperty(MAX_CONNECTIONS_PARAM)!= null) {
+			return Integer.parseInt(System.getProperty(MAX_CONNECTIONS_PARAM));
+		}else {
+			return DEFAULT_MAX_CONNECTIONS;
+		}
+	}
+	private static int getMaxConnectionsPerHost() {
+		if (System.getProperty(MAX_CONNECTIONS_PER_HOST_PARAM)!= null) {
+			return Integer.parseInt(System.getProperty(MAX_CONNECTIONS_PER_HOST_PARAM));
+		}else {
+			return DEFAULT_MAX_CONNECTIONS_PER_HOST;
+		}
 	}
 	public static InputStream getURLBody(final String url, StringBuffer charset) throws IOException{
 		return getURLBody(url, charset, new HashMap<String, String>());
