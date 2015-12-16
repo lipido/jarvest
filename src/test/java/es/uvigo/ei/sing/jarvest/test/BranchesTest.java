@@ -30,12 +30,39 @@ import es.uvigo.ei.sing.jarvest.dsl.Jarvest;
 
 public class BranchesTest {
 	
+	@Test
+	public void testDuplicatedScatteredUnbalanced() throws Exception {
+		Jarvest jarvest = new Jarvest();
+
+		
+		
+		String[] results = jarvest.exec(
+						"append('aabb')\n"+
+						"append('aaabb')\n"+
+						"append('bbb')\n"+
+						"branch(:BRANCH_DUPLICATED, :SCATTERED) {\n"+
+						"	match('(a)')\n"+
+						"	match('(b)')\n"+
+						"}");
+	
+		System.out.println(Arrays.toString(results));
+		assertEquals("a", results[0]);
+		assertEquals("b", results[1]);
+		assertEquals("a", results[2]);
+		assertEquals("b", results[3]);
+		assertEquals("a", results[4]);
+		assertEquals("b", results[5]);
+		assertEquals("a", results[6]);
+		assertEquals("b", results[7]);
+		assertEquals("a", results[8]);
+		assertEquals("b", results[9]);
+		assertEquals("b", results[10]);
+		assertEquals("b", results[11]);
+	}
 	
 	@Test
 	public void testScatteredScattered() throws Exception {
 		Jarvest jarvest = new Jarvest();
-
-		
 		
 		String[] results = jarvest.exec(
 						"append('a')\n"+
@@ -47,12 +74,10 @@ public class BranchesTest {
 						"	decorate(:head=>'', :tail=>'')\n"+
 						"}");
 	
-		System.out.println(Arrays.toString(results));
 		assertEquals("a", results[0]);
 		assertEquals("b", results[1]);
 		assertEquals("c", results[2]);
 		assertEquals("d", results[3]);
-		
 	}
 	
 	@Test
@@ -71,7 +96,6 @@ public class BranchesTest {
 				"	decorate(:head=>'', :tail=>'')\n"+
 				"}");
 
-		System.out.println(Arrays.toString(results));
 		assertEquals("a", results[0]);
 		assertEquals("c", results[1]);
 		assertEquals("b", results[2]);
@@ -94,8 +118,6 @@ public class BranchesTest {
 				"}");
 
 		assertEquals(Arrays.asList(new String[]{"a", "a", "b", "b", "b", "b"}), Arrays.asList(results));
-		
 	}
-
 }
 

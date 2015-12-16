@@ -450,6 +450,29 @@ public abstract class AbstractTransformer extends Observable implements Transfor
 				
 				finishedChilds.add(childs.get(childNumber));
 				
+				// added this if in 16/12/2015
+				if (childNumber == currentOutput){
+					
+					// go to next childs
+					int child = childNumber;
+					
+					do{
+						child = child+1;
+						if (child == childs.size()) break;
+						
+						LinkedList<String> queue = childQueues.get(childs.get(child));
+						while (queue.size()>1){
+							outputHandler.pushOutput(queue.poll());
+							 outputHandler.outputFinished();
+						}
+						if (queue.size()==1 && queue.peek()!=null){
+							outputHandler.pushOutput(queue.poll());
+							queue.offer(null);
+						}
+					}while (finishedChilds.contains(childs.get(child)));
+					currentOutput = child;
+				}
+
 				if ((isLoop() && loopFinished==true && finishedChilds.size() == childs.size()-1) || (!isLoop() && finishedChilds.size() == childs.size())){
 					
 					//currentOutput = 0;//added 14/5/08 //removed 15/11/12
